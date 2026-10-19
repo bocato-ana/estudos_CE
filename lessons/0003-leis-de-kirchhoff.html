@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 03: Topologia de Redes & Leis de Kirchhoff</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        /* Power Table */
+        .power-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        .power-table th, .power-table td {
+            padding: 0.75rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .power-table th {
+            background: rgba(168, 85, 247, 0.1);
+            color: var(--neon-purple);
+            font-weight: 700;
+        }
+
+        .power-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .power-table .sum-row {
+            font-weight: 700;
+            color: var(--neon-emerald);
+            background: rgba(16, 185, 129, 0.08);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="nav-bar">
+                <a href="../index.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub Principal
+                </a>
+                <div class="lesson-badge-header">
+                    <i class="fa-solid fa-network-wired"></i> Aula 4 • Prof. Henrique Amorim
+                </div>
+            </div>
+            <h1>Topologia de Redes & Leis de Kirchhoff</h1>
+            <p class="subtitle">Ramos, Nós, Laços, LKC, LKT e Associação de Resistores Série/Paralelo</p>
+        </header>
+
+        <!-- SEÇÃO 1: TOPOLOGIA DE REDES -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-diagram-project"></i> Geometria dos Circuitos</div>
+            <h2>1. Topologia de Rede: Ramos ($b$), Nós ($n$) e Laços ($l$)</h2>
+            <p>
+                A topologia estuda a conectividade dos componentes no circuito, independentemente de sua natureza física.
+            </p>
+
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-bezier-curve" style="color: var(--neon-purple);"></i> Elementos Fundamentais</h4>
+                    <ul style="color: var(--text-secondary); margin-left: 1.2rem; font-size: 0.95rem;">
+                        <li style="margin-bottom: 0.4rem;"><strong>Ramo ($b$):</strong> representa um único bipolo (ex: um resistor, uma fonte).</li>
+                        <li style="margin-bottom: 0.4rem;"><strong>Nó ($n$):</strong> ponto de conexão entre dois ou mais ramos.</li>
+                        <li><strong>Laço / Malha ($l$):</strong> qualquer caminho fechado que parte de um nó e retorna a ele sem repetir nós intermediários.</li>
+                    </ul>
+                </div>
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-calculator" style="color: var(--electric-cyan);"></i> Teorema Topológico Fundamental</h4>
+                    <div class="formula-body" style="font-size: 1.3rem; color: var(--electric-cyan);">
+                        $$b = l + n - 1$$
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-dim); text-align: center;">
+                        Garante que o número de equações linearmente independentes seja exatamente o suficiente para resolver todas as variáveis do circuito!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: AS DUAS LEIS DE KIRCHHOFF -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-scale-balanced"></i> Princípios de Conservação</div>
+            <h2>2. As Duas Leis de Kirchhoff (LKC & LKT)</h2>
+            
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">LKC: Lei de Kirchhoff das Correntes (1ª Lei)</span>
+                    <span class="formula-title">Conservação da Carga no Nó</span>
+                </div>
+                <div class="formula-body">
+                    $$\sum_{k=1}^n i_k = 0 \iff \sum i_{\text{que entram}} = \sum i_{\text{que saem}}$$
+                </div>
+                <div class="formula-desc">
+                    Em nenhum instante de tempo os nós elétricos acumulam carga líquida.
+                </div>
+            </div>
+
+            <div class="formula-card" style="border-left-color: var(--electric-cyan);">
+                <div class="formula-header">
+                    <span class="formula-title">LKT: Lei de Kirchhoff das Tensões (2ª Lei)</span>
+                    <span class="formula-title">Conservação da Energia na Malha</span>
+                </div>
+                <div class="formula-body">
+                    $$\sum_{m=1}^k v_m = 0$$
+                </div>
+                <div class="formula-desc">
+                    A soma algébrica de todas as quedas e elevações de potencial ao longo de qualquer caminho fechado é identicamente zero.
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: SIMULADOR DE CIRCUITO REAL DE KIRCHHOFF -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-play"></i> Laboratório Interativo</div>
+            <h2>3. Análise Completa de Circuito com Dupla Malha (UNIFESP)</h2>
+            <p>
+                Considere o circuito com uma fonte de tensão $V_s$ alimentando um resistor $R_1$ em série e uma associação em paralelo de $R_2 \parallel R_3$:
+            </p>
+
+            <!-- SIMULADOR CANVAS LKC / LKT -->
+            <div class="sim-container">
+                <div class="sim-header">
+                    <div class="sim-title">
+                        <i class="fa-solid fa-microchip"></i> Resolução Dinâmica de Circuito em Malha
+                    </div>
+                    <div class="sim-stats">
+                        <div class="stat-pill">Balanço $\sum P$: <span id="statPowerSum" style="color: var(--neon-emerald);">0.00 W</span></div>
+                    </div>
+                </div>
+                <canvas id="canvasKclKvl" class="sim-canvas"></canvas>
+                <div class="sim-controls">
+                    <div class="control-group">
+                        <label>Fonte $V_s$ (V)</label>
+                        <input type="range" class="custom-slider" id="sliderVs" min="10" max="60" step="5" value="30" oninput="updateKclKvlSim()">
+                    </div>
+                    <div class="control-group">
+                        <label>Resistor $R_1$ ($\Omega$)</label>
+                        <input type="range" class="custom-slider" id="sliderR1" min="2" max="20" step="1" value="8" oninput="updateKclKvlSim()">
+                    </div>
+                    <div class="control-group">
+                        <label>Resistor $R_2$ ($\Omega$)</label>
+                        <input type="range" class="custom-slider" id="sliderR2" min="1" max="15" step="1" value="3" oninput="updateKclKvlSim()">
+                    </div>
+                    <div class="control-group">
+                        <label>Resistor $R_3$ ($\Omega$)</label>
+                        <input type="range" class="custom-slider" id="sliderR3" min="1" max="15" step="1" value="6" oninput="updateKclKvlSim()">
+                    </div>
+                </div>
+            </div>
+
+            <h3>Tabela de Balanço de Potência Instantâneo</h3>
+            <table class="power-table">
+                <thead>
+                    <tr>
+                        <th>Componente</th>
+                        <th>Tensão ($V$)</th>
+                        <th>Corrente ($I$)</th>
+                        <th>Resistência</th>
+                        <th>Potência ($P = V \cdot I$)</th>
+                    </tr>
+                </thead>
+                <tbody id="powerTableBody">
+                    <!-- Dinâmico via JS -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SEÇÃO 4: EXERCÍCIO COM FONTE DEPENDENTE -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-diamond"></i> Desafio UNIFESP</div>
+            <h2>4. Malha com Fonte Controlada por Tensão</h2>
+            <p>
+                Problema da Aula 4: <em>"Calcule o valor de $v_o$ e a tensão da fonte dependente no circuito fechado contendo $12\text{V}$, $4\Omega$, fonte dependente $2v_o$, fonte de $4\text{V}$ e resistor de $6\Omega$."</em>
+            </p>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">Resolução Algébrica pela LKT</span>
+                </div>
+                <div class="formula-body" style="font-size: 1rem; text-align: left;">
+                    1. Aplicando a LKT no sentido horário: $-12 + 4i + 2v_o - 4 + 6i = 0$<br>
+                    2. Expressando $v_o$ em função da corrente $i$: Como $v_o$ está no resistor de $6\Omega$ com polaridade oposta ao sentido de $i$, temos $v_o = -6i$<br>
+                    3. Substituindo $v_o$: $-16 + 10i + 2(-6i) = 0 \implies -16 - 2i = 0 \implies \mathbf{i = -8\,\text{A}}$<br>
+                    4. Calculando as tensões: $\mathbf{v_o = -6(-8) = +48\,\text{V}}$ e $\mathbf{v_{\text{fonte dep}} = 2v_o = +96\,\text{V}}$
+                </div>
+            </div>
+
+            <!-- Quiz Interativo -->
+            <div class="quiz-card">
+                <div class="quiz-title">
+                    <i class="fa-solid fa-circle-question"></i> Quiz: Associação de Resistores em Paralelo
+                </div>
+                <div class="quiz-question">
+                    Dois resistores de $10\,\Omega$ e $40\,\Omega$ são associados em paralelo. Qual o resistor equivalente $R_{eq}$?
+                </div>
+                <div class="quiz-options">
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, false, 'Incorreto. Em paralelo, $R_{eq}$ é sempre MENOR que o menor dos resistores.')">
+                        A) $50\,\Omega$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, true, 'Excelente! $R_{eq} = \\frac{10 \\cdot 40}{10 + 40} = \\frac{400}{50} = 8\\,\\Omega$.')">
+                        B) $8\,\Omega$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, false, 'Incorreto. Utilize a fórmula $R_1 R_2 / (R_1 + R_2)$.')">
+                        C) $25\,\Omega$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                </div>
+                <div id="quizExp" class="quiz-explanation"></div>
+            </div>
+        </section>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="0002-lei-de-ohm-fontes.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Aula Anterior
+            </a>
+            <a href="0004-divisores-tensao-corrente.html" class="nav-next-btn">
+                Próxima Aula: Divisores de Tensão & Corrente <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Script de Simulação e Balanço -->
+    <script>
+        const cvsK = document.getElementById('canvasKclKvl');
+        const ctxK = cvsK.getContext('2d');
+
+        function updateKclKvlSim() {
+            const vs = parseFloat(document.getElementById('sliderVs').value);
+            const r1 = parseFloat(document.getElementById('sliderR1').value);
+            const r2 = parseFloat(document.getElementById('sliderR2').value);
+            const r3 = parseFloat(document.getElementById('sliderR3').value);
+
+            // R_paralelo = (r2 * r3) / (r2 + r3)
+            const rPar = (r2 * r3) / (r2 + r3);
+            const req = r1 + rPar;
+
+            const i1 = vs / req;
+            const vPar = i1 * rPar;
+            const i2 = vPar / r2;
+            const i3 = vPar / r3;
+
+            const v1 = i1 * r1;
+
+            const pFonte = -vs * i1;
+            const pR1 = v1 * i1;
+            const pR2 = vPar * i2;
+            const pR3 = vPar * i3;
+
+            // Render Tabela
+            const tbody = document.getElementById('powerTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td>Fonte ($V_s$)</td>
+                    <td>${vs.toFixed(1)} V</td>
+                    <td>${i1.toFixed(2)} A</td>
+                    <td>-</td>
+                    <td style="color: var(--neon-amber);">${pFonte.toFixed(2)} W (Gerando)</td>
+                </tr>
+                <tr>
+                    <td>Resistor R1</td>
+                    <td>${v1.toFixed(1)} V</td>
+                    <td>${i1.toFixed(2)} A</td>
+                    <td>${r1.toFixed(0)} Ω</td>
+                    <td style="color: var(--neon-emerald);">${pR1.toFixed(2)} W</td>
+                </tr>
+                <tr>
+                    <td>Resistor R2</td>
+                    <td>${vPar.toFixed(1)} V</td>
+                    <td>${i2.toFixed(2)} A</td>
+                    <td>${r2.toFixed(0)} Ω</td>
+                    <td style="color: var(--neon-emerald);">${pR2.toFixed(2)} W</td>
+                </tr>
+                <tr>
+                    <td>Resistor R3</td>
+                    <td>${vPar.toFixed(1)} V</td>
+                    <td>${i3.toFixed(2)} A</td>
+                    <td>${r3.toFixed(0)} Ω</td>
+                    <td style="color: var(--neon-emerald);">${pR3.toFixed(2)} W</td>
+                </tr>
+                <tr class="sum-row">
+                    <td colspan="4">Balanço Total de Potência ($\sum P$)</td>
+                    <td>${(pFonte + pR1 + pR2 + pR3).toFixed(2)} W (Conservação OK)</td>
+                </tr>
+            `;
+
+            // Canvas Schematic
+            const w = cvsK.parentElement.clientWidth - 48;
+            const h = 250;
+            cvsK.width = w;
+            cvsK.height = h;
+
+            ctxK.clearRect(0, 0, w, h);
+
+            // Wires
+            ctxK.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+            ctxK.lineWidth = 3;
+
+            // Loop 1
+            ctxK.beginPath();
+            ctxK.moveTo(80, 50);
+            ctxK.lineTo(w / 2, 50);
+            ctxK.lineTo(w / 2, 200);
+            ctxK.lineTo(80, 200);
+            ctxK.closePath();
+            ctxK.stroke();
+
+            // Loop 2 branch
+            ctxK.beginPath();
+            ctxK.moveTo(w / 2, 50);
+            ctxK.lineTo(w - 80, 50);
+            ctxK.lineTo(w - 80, 200);
+            ctxK.lineTo(w / 2, 200);
+            ctxK.stroke();
+
+            // Nodes
+            ctxK.fillStyle = '#00f2fe';
+            [ [w/2, 50], [w/2, 200] ].forEach(pt => {
+                ctxK.beginPath();
+                ctxK.arc(pt[0], pt[1], 5, 0, Math.PI * 2);
+                ctxK.fill();
+            });
+
+            // Labels
+            ctxK.fillStyle = '#fff';
+            ctxK.font = 'bold 13px JetBrains Mono';
+            ctxK.fillText(`Vs = ${vs}V`, 45, 130);
+            ctxK.fillText(`R1 = ${r1}Ω  (i1 = ${i1.toFixed(2)}A)`, 120, 40);
+            ctxK.fillText(`R2 = ${r2}Ω (i2 = ${i2.toFixed(2)}A)`, w / 2 - 80, 130);
+            ctxK.fillText(`R3 = ${r3}Ω (i3 = ${i3.toFixed(2)}A)`, w - 160, 130);
+        }
+
+        window.addEventListener('resize', updateKclKvlSim);
+        setTimeout(updateKclKvlSim, 50);
+
+        // Quiz Logic
+        function checkQuiz(btn, isCorrect, explanation) {
+            const parent = btn.parentElement;
+            const buttons = parent.querySelectorAll('.quiz-option-btn');
+            buttons.forEach(b => b.disabled = true);
+            
+            if (isCorrect) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('wrong');
+            }
+            
+            const exp = document.getElementById('quizExp');
+            exp.style.display = 'block';
+            exp.innerHTML = `<p style="color: ${isCorrect ? 'var(--neon-emerald)' : 'var(--neon-rose)'}; font-weight: 600;">${isCorrect ? '✅ Resposta Correta!' : '❌ Incorreto.'}</p><p>${explanation}</p>`;
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+    </script>
+</body>
+</html>

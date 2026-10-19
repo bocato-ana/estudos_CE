@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 10: Método das Correntes de Malha & Supermalha</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .mesh-badge {
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .supermesh-card {
+            border: 2px dashed var(--neon-amber);
+            background: rgba(245, 158, 11, 0.08);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--neon-purple);
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+
+        .tab-btn.active {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .comparison-table th {
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--neon-purple);
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="nav-bar">
+                <a href="../index.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub Principal
+                </a>
+                <div class="lesson-badge-header">
+                    <i class="fa-solid fa-arrows-spin"></i> Aula 12 • Prof. Henrique Amorim
+                </div>
+            </div>
+            <h1>Técnicas de Análise: Método das Correntes de Malha & Supermalha</h1>
+            <p class="subtitle">Circuitos Planares, Correntes Fictícias de Laço, Ramos Compartilhados vs Exclusivos, Fontes Dependentes e o Teorema da Supermalha</p>
+        </header>
+
+        <!-- SEÇÃO 1: FUNDAMENTAÇÃO DO MÉTODO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-bezier-curve"></i> Princípio Físico</div>
+            <h2>1. O Conceito de Correntes de Malha</h2>
+            <p>
+                O Método das Correntes de Malha é aplicável a <strong>circuitos planares</strong> (que podem ser desenhados em um plano sem fios se cruzando). Em vez de associar correntes reais a cada ramo individual, definimos correntes fictícias circulantes fechadas no interior de cada malha elementar.
+            </p>
+
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-rotate-right" style="color: var(--neon-purple);"></i> Padronização no Sentido Horário</h4>
+                    <p style="font-size: 0.9rem;">
+                        Para padronizar e evitar erros de álgebra, o Prof. Amorim recomenda que <strong>todas as correntes de malha girem no sentido horário</strong>. As correntes de malha são grandezas matemáticas que não podem ser medidas diretamente por um amperímetro em ramos internos compartilhados.
+                    </p>
+                </div>
+
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-calculator" style="color: var(--electric-cyan);"></i> Teorema do Número de Malhas ($m$)</h4>
+                    <div class="formula-body" style="font-size: 1.3rem; color: var(--electric-cyan);">
+                        $$m = b_e - (n_e - 1)$$
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-dim); text-align: center;">
+                        O número de equações da LKT necessárias para resolver as correntes de malha é exatamente igual ao número de janelas (malhas) independentes do circuito planar!
+                    </p>
+                </div>
+            </div>
+
+            <div class="alert-box alert-info">
+                <i class="fa-solid fa-arrows-left-right"></i>
+                <div>
+                    <strong>Ramos Exclusivos vs Compartilhados:</strong><br>
+                    • <strong>Ramo Exclusivo (perímetro externo):</strong> A corrente real do ramo é exatamente a própria corrente da malha: $i_{\text{ramo}} = i_a$.<br>
+                    • <strong>Ramo Compartilhado (interno entre duas malhas):</strong> A corrente real é a <strong>diferença</strong> entre as correntes de perímetro: $i_{\text{ramo}} = i_a - i_b$.
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: EXEMPLO 1 CLÁSSICO DE 2 MALHAS -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-play"></i> Exemplo Guiado 1</div>
+            <h2>2. Resolução Completa de Circuito com Duas Malhas (UNIFESP)</h2>
+            <p>
+                Considere o circuito com fonte de $60\,\text{V}$, $R_1 = 20\,\Omega$, $R_3 = 5\,\Omega$ (compartilhado), $R_2 = 2\,\Omega$ e fonte de $30\,\text{V}$:
+            </p>
+
+            <div class="circuit-svg-box">
+                <svg viewBox="0 0 650 220" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Fio inferior comum -->
+                    <line x1="80" y1="180" x2="570" y2="180" stroke="#38bdf8" stroke-width="2.5"/>
+
+                    <!-- Malha 1: Fonte 60V + 20Ω -->
+                    <line x1="80" y1="180" x2="80" y2="60" stroke="#38bdf8" stroke-width="2.5"/>
+                    <circle cx="80" cy="120" r="18" fill="#090d16" stroke="#00f2fe" stroke-width="2"/>
+                    <text x="80" y="117" fill="#fff" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">+</text>
+                    <text x="80" y="130" fill="#fff" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">-</text>
+                    <text x="45" y="125" fill="#00f2fe" font-family="'JetBrains Mono'" font-size="12" font-weight="bold">60V</text>
+                    <line x1="80" y1="60" x2="325" y2="60" stroke="#38bdf8" stroke-width="2.5"/>
+                    <rect x="175" y="48" width="55" height="24" fill="#121a2c" stroke="#38bdf8" stroke-width="2" rx="4"/>
+                    <text x="202" y="64" fill="#fff" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle">20Ω</text>
+
+                    <!-- Seta circular Malha 1 -->
+                    <path d="M 180 110 A 25 25 0 1 1 200 145" fill="none" stroke="#00f2fe" stroke-width="2.5" stroke-dasharray="4"/>
+                    <polygon points="195,148 205,145 200,138" fill="#00f2fe"/>
+                    <text x="200" y="125" fill="#00f2fe" font-family="'JetBrains Mono'" font-size="14" font-weight="bold">i_a</text>
+
+                    <!-- Ramo Central Compartilhado (5Ω) -->
+                    <line x1="325" y1="60" x2="325" y2="180" stroke="#38bdf8" stroke-width="2.5"/>
+                    <rect x="313" y="100" width="24" height="45" fill="#121a2c" stroke="#38bdf8" stroke-width="2" rx="4"/>
+                    <text x="350" y="127" fill="#fff" font-family="'JetBrains Mono'" font-size="11">5Ω</text>
+
+                    <!-- Seta circular Malha 2 -->
+                    <path d="M 430 110 A 25 25 0 1 1 450 145" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-dasharray="4"/>
+                    <polygon points="445,148 455,145 450,138" fill="#a855f7"/>
+                    <text x="450" y="125" fill="#a855f7" font-family="'JetBrains Mono'" font-size="14" font-weight="bold">i_b</text>
+
+                    <!-- Malha 2: 2Ω + Fonte 30V -->
+                    <line x1="325" y1="60" x2="570" y2="60" stroke="#38bdf8" stroke-width="2.5"/>
+                    <rect x="420" y="48" width="55" height="24" fill="#121a2c" stroke="#38bdf8" stroke-width="2" rx="4"/>
+                    <text x="447" y="64" fill="#fff" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle">2Ω</text>
+                    <line x1="570" y1="60" x2="570" y2="180" stroke="#38bdf8" stroke-width="2.5"/>
+                    <circle cx="570" cy="120" r="18" fill="#090d16" stroke="#f43f5e" stroke-width="2"/>
+                    <text x="570" y="117" fill="#fff" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">+</text>
+                    <text x="570" y="130" fill="#fff" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">-</text>
+                    <text x="605" y="125" fill="#f43f5e" font-family="'JetBrains Mono'" font-size="12" font-weight="bold">30V</text>
+                </svg>
+            </div>
+
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchMTab(1)">Equações de Malha</button>
+                <button class="tab-btn" onclick="switchMTab(2)">Resolução das Correntes</button>
+                <button class="tab-btn" onclick="switchMTab(3)">Balanço de Potências</button>
+            </div>
+
+            <div id="mTab1" class="tab-pane active">
+                <div class="formula-card">
+                    <div class="formula-header">
+                        <span class="formula-title">LKT Percorrendo a Malha $a$ e a Malha $b$</span>
+                    </div>
+                    <div class="formula-body" style="font-size: 1.05rem; text-align: left;">
+                        $$\text{Malha } a: \quad -60 + 20 i_a + 5 (i_a - i_b) = 0 \implies \mathbf{25 i_a - 5 i_b = 60}$$
+                        $$\text{Malha } b: \quad 5 (i_b - i_a) + 2 i_b + 30 = 0 \implies \mathbf{-5 i_a + 7 i_b = -30}$$
+                    </div>
+                </div>
+            </div>
+
+            <div id="mTab2" class="tab-pane">
+                <div class="formula-card" style="border-left-color: var(--neon-purple);">
+                    <div class="formula-header">
+                        <span class="formula-title">Cálculo das Correntes</span>
+                    </div>
+                    <div class="formula-body">
+                        $$\mathbf{i_a = 1{,}8\,\text{A}} \qquad \mathbf{i_b = -3{,}0\,\text{A}}$$
+                        $$i_{5\Omega} = i_a - i_b = 1{,}8 - (-3{,}0) = \mathbf{4{,}8\,\text{A}}$$
+                    </div>
+                    <div class="formula-desc">
+                        O sinal negativo de $i_b$ indica simplesmente que na malha $b$ a corrente real circula no sentido anti-horário!
+                    </div>
+                </div>
+            </div>
+
+            <div id="mTab3" class="tab-pane">
+                <div class="formula-card" style="border-left-color: var(--neon-emerald);">
+                    <div class="formula-header">
+                        <span class="formula-title">Balanço Energético Perfeito</span>
+                    </div>
+                    <div class="formula-body" style="font-size: 0.95rem; text-align: left;">
+                        • Fonte 60V: $P = -60 \cdot 1{,}8 = \mathbf{-108\,\text{W}}$ (fornecendo)<br>
+                        • Fonte 30V: $P = +30 \cdot (-3) = \mathbf{-90\,\text{W}}$ (fornecendo)<br>
+                        • Resistor 20Ω: $P = (1{,}8)^2 \cdot 20 = \mathbf{+64{,}8\,\text{W}}$<br>
+                        • Resistor 2Ω: $P = (3)^2 \cdot 2 = \mathbf{+18{,}0\,\text{W}}$<br>
+                        • Resistor 5Ω: $P = (4{,}8)^2 \cdot 5 = \mathbf{+115{,}2\,\text{W}}$<br>
+                        $$\sum P_{\text{fornecida}} = 108 + 90 = 198\,\text{W} \equiv \sum P_{\text{dissipada}} = 64{,}8 + 18 + 115{,}2 = 198\,\text{W}$$
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: CASOS PARTICULARES -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-list-ol"></i> Casos Especiais</div>
+            <h2>3. Três Casos de Atenção Especial</h2>
+
+            <!-- CASO 1: FONTE DE CORRENTE NO PERÍMETRO -->
+            <div class="card-panel" style="margin-bottom: 2rem;">
+                <span class="mesh-badge">Caso 1</span>
+                <h4 style="margin-top: 0.5rem; color: var(--electric-cyan);"><i class="fa-solid fa-compress"></i> Fonte de Corrente em Ramo Exclusivo (Perímetro)</h4>
+                <p style="font-size: 0.92rem;">
+                    Quando uma fonte de corrente está localizada em um ramo exterior pertencente a uma única malha:
+                    A corrente dessa malha fica <strong>imediatamente determinada</strong> ($i_c = \pm I_s$), eliminando uma equação do sistema!
+                </p>
+                <div class="alert-box alert-info">
+                    <i class="fa-solid fa-check"></i>
+                    <div>
+                        <strong>Exemplo do Slide 13-16:</strong> Circuito com 3 malhas onde a malha $c$ possui uma fonte de corrente de $16\,\text{A}$ subindo no perímetro direito.<br>
+                        Como a malha $c$ gira em sentido horário e a fonte aponta para cima: $\mathbf{i_c = -16\,\text{A}}$.<br>
+                        O sistema de 3 malhas reduz-se a apenas <strong>2 equações para $i_a$ e $i_b$</strong>!
+                        $$11 i_a - 2 i_b = 30 \quad \text{e} \quad -2 i_a + 19 i_b = -80 \implies \mathbf{i_a = 2\,\text{A}}, \quad \mathbf{i_b = -4\,\text{A}}$$
+                        $$P_{2\Omega} = (i_a - i_b)^2 \cdot 2 = (2 - (-4))^2 \cdot 2 = 6^2 \cdot 2 = \mathbf{72\,\text{W}}$$
+                    </div>
+                </div>
+            </div>
+
+            <!-- CASO 2: FONTE CONTROLADA -->
+            <div class="card-panel" style="margin-bottom: 2rem;">
+                <span class="mesh-badge">Caso 2</span>
+                <h4 style="margin-top: 0.5rem; color: var(--neon-purple);"><i class="fa-solid fa-microchip"></i> Fonte Dependente no Circuito (Slide 17-19)</h4>
+                <p style="font-size: 0.92rem;">
+                    Expressa-se a variável de controle em função das correntes de malha. No exercício com fonte controlada $\frac{2 V_o}{5}$ e fonte fixa de $10\,\text{A}$ ($i_b = -10\,\text{A}$):
+                    $$V_o = 5(i_a - i_c) \implies i_c = \frac{2 \cdot 5(i_a - i_c)}{5} = 2 i_a - 2 i_c \implies \mathbf{i_c = \frac{2 i_a}{3}}$$
+                    Substituindo na malha $a$:
+                    $$-75 + 2(i_a - (-10)) + 5\left(i_a - \frac{2 i_a}{3}\right) = 0 \implies \mathbf{i_a = 15\,\text{A}}, \quad \mathbf{i_c = 10\,\text{A}}, \quad \mathbf{V_o = 25\,\text{V}}$$
+                </p>
+            </div>
+
+            <!-- CASO 3: A SUPERMALHA -->
+            <div class="supermesh-card">
+                <span class="mesh-badge" style="background: rgba(245,158,11,0.2); border-color: var(--neon-amber); color: var(--neon-amber);">Caso 3</span>
+                <h4 style="margin-top: 0.5rem; color: var(--neon-amber); font-size: 1.2rem;"><i class="fa-solid fa-circle-exclamation"></i> A Supermalha: Fonte de Corrente Compartilhada</h4>
+                <p style="font-size: 0.92rem; color: var(--text-secondary);">
+                    Quando uma fonte de corrente está localizada em um ramo compartilhado por duas malhas internas, <strong>não conhecemos a tensão $V_x$ nos terminais da fonte</strong>.
+                </p>
+                <div class="grid-2col" style="margin-top: 1rem;">
+                    <div class="card-panel">
+                        <strong style="color: var(--electric-cyan);">1. Equação de Restrição da Fonte</strong>
+                        <p style="font-size: 0.88rem; margin-top: 0.3rem;">
+                            A diferença entre as correntes de malha que passam pela fonte deve igualar o valor da fonte de corrente:
+                            $$\mathbf{i_2 - i_1 = I_s}$$
+                        </p>
+                    </div>
+                    <div class="card-panel">
+                        <strong style="color: var(--neon-amber);">2. Percorrer a Supermalha Externa</strong>
+                        <p style="font-size: 0.88rem; margin-top: 0.3rem;">
+                            "Desconecta-se" mentalmente o ramo da fonte de corrente, criando uma grande malha externa. Percorre-se o contorno aplicando a LKT completa!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="formula-card" style="border-left-color: var(--neon-amber); margin-top: 1.25rem;">
+                    <div class="formula-header">
+                        <span class="formula-title">Exemplo Resolvido da Supermalha (Slides 20 a 24)</span>
+                    </div>
+                    <div class="formula-body" style="font-size: 0.95rem; text-align: left;">
+                        Circuito com fonte de $20\,\text{V}$, resistores $2\,\Omega, 3\,\Omega, 1\,\Omega, 4\,\Omega$ e fonte de $2\,\text{A}$ compartilhada:<br><br>
+                        <strong>Equação de Restrição:</strong> $i_2 - i_1 = 2 \implies i_1 - i_2 = -2$<br>
+                        <strong>LKT na Supermalha:</strong> $-20 + 2 i_1 + 3 i_1 + 1 i_2 + 4 i_2 = 0 \implies 5 i_1 + 5 i_2 = 20$<br>
+                        Resolvendo o par de equações:<br>
+                        $$\mathbf{i_1 = 1\,\text{A}} \qquad \mathbf{i_2 = 3\,\text{A}}$$
+                        Tensão na fonte de corrente: $V_1 = i_2 \cdot (1 + 4) = 3 \cdot 5 = \mathbf{15\,\text{V}}$<br>
+                        Potência da fonte de 2A: $P_{2A} = -2 \cdot 15 = \mathbf{-30\,\text{W}}$ (fornecendo energia).
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: COMPARAÇÃO NÓS VS MALHAS -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-code-compare"></i> Estratégia de Escolha</div>
+            <h2>4. Comparação Crucial: Tensões dos Nós vs Correntes de Malha</h2>
+            <p>
+                O Prof. Henrique Amorim resolve o mesmo circuito por <strong>Tensões dos Nós (Slide 25)</strong>:
+            </p>
+            <div class="formula-card" style="border-left-color: var(--electric-cyan);">
+                <div class="formula-body">
+                    $$\frac{V_1 - 20}{5} - 2 + \frac{V_1}{5} = 0 \implies V_1 \cdot \left(\frac{2}{5}\right) = 4 + 2 = 6 \implies \mathbf{V_1 = 15\,\text{V}}$$
+                </div>
+                <div class="formula-desc">
+                    Por malhas: exigiu supermalha, duas equações e sistema linear. Por nós: <strong>uma única equação linear trivial de 1º grau</strong>!
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Conceito</th>
+                        <th>Método das Tensões dos Nós</th>
+                        <th>Método das Correntes de Malha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Variável Incógnita</strong></td>
+                        <td>Potenciais nodais $v_k$ em relação ao terra</td>
+                        <td>Correntes circulantes $i_m$ de cada laço</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lei Fundamental Usada</strong></td>
+                        <td>LKC nos nós essenciais</td>
+                        <td>LKT nas malhas essenciais</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Número de Equações</strong></td>
+                        <td>$n_e - 1$</td>
+                        <td>$b_e - (n_e - 1) = m$</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Elemento Especial</strong></td>
+                        <td><span style="color: var(--neon-rose);">Supernó</span> (quando há fonte de tensão flutuante)</td>
+                        <td><span style="color: var(--neon-amber);">Supermalha</span> (quando há fonte de corrente interna)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quando Preferir?</strong></td>
+                        <td>Quando $n_e - 1 < m$ ou existirem muitas fontes de tensão no terra</td>
+                        <td>Quando $m < n_e - 1$ ou existirem fontes de corrente no perímetro</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SEÇÃO 5: QUIZ DE FIXAÇÃO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-clipboard-check"></i> Fixação</div>
+            <h2>5. Autoavaliação da Aula</h2>
+
+            <div class="quiz-card">
+                <div class="quiz-title"><i class="fa-solid fa-question"></i> Questão: Condição de Supermalha</div>
+                <div class="quiz-question">
+                    Uma Supermalha deve ser construída quando encontramos no circuito:
+                </div>
+                <div class="quiz-options">
+                    <button class="quiz-option-btn" onclick="checkQ(this, false, 'qmExp')">A) Uma fonte de tensão entre dois nós essenciais que não são o terra.</button>
+                    <button class="quiz-option-btn" onclick="checkQ(this, true, 'qmExp')">B) Uma fonte de corrente compartilhada entre duas malhas vizinhas.</button>
+                    <button class="quiz-option-btn" onclick="checkQ(this, false, 'qmExp')">C) Três resistores em paralelo.</button>
+                </div>
+                <div id="qmExp" class="quiz-explanation">
+                    <strong>Correto!</strong> Uma Supermalha surge exclusivamente quando uma fonte de corrente (independente ou controlada) divide fronteira entre duas malhas adjacentes, impedindo a determinação imediata de sua tensão.
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="0009-metodo-tensoes-dos-nos.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Aula 09: Método dos Nós & Supernó
+            </a>
+            <a href="../index.html" class="nav-next-btn">
+                <i class="fa-solid fa-house"></i> Voltar ao Hub Principal
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function switchMTab(idx) {
+            document.querySelectorAll('.tab-btn').forEach((b, i) => {
+                b.classList.toggle('active', i === idx - 1);
+            });
+            for (let i = 1; i <= 3; i++) {
+                const p = document.getElementById('mTab' + i);
+                if (p) p.classList.toggle('active', i === idx);
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function checkQ(btn, isCorrect, expId) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.quiz-option-btn').forEach(b => b.disabled = true);
+            if (isCorrect) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('wrong');
+            }
+            const exp = document.getElementById(expId);
+            if (exp) exp.style.display = 'block';
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+    </script>
+</body>
+</html>

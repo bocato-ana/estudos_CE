@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuitos Elétricos I - Portal Interativo (UNIFESP ICT)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="assets/theme.css">
+
+    <style>
+        body {
+            padding: 2.5rem 1.25rem 4rem 1.25rem;
+        }
+
+        /* Top Bar Navigation */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .uni-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--electric-cyan);
+            font-family: var(--font-mono);
+        }
+
+        /* Hero Header */
+        header.hero {
+            text-align: center;
+            margin-bottom: 3.5rem;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: linear-gradient(90deg, rgba(0, 242, 254, 0.12), rgba(168, 85, 247, 0.12));
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: #7dd3fc;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 20%, #7dd3fc 60%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+        }
+
+        .hero-desc {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            max-width: 780px;
+            margin: 0 auto 1.8rem auto;
+            font-weight: 400;
+        }
+
+        .author-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        .author-tag strong {
+            color: var(--text-primary);
+        }
+
+        /* Quick Interactive Ohm Law Floating Widget */
+        .ohm-widget-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+
+        .ohm-widget-info h3 {
+            font-size: 1.15rem;
+            color: var(--electric-cyan);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ohm-widget-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .ohm-calc-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .calc-input-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .calc-input-box label {
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .calc-input-box input {
+            background: rgba(10, 15, 26, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            padding: 0.45rem 0.75rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            width: 100px;
+            transition: border-color 0.2s;
+        }
+
+        .calc-input-box input:focus {
+            outline: none;
+            border-color: var(--electric-cyan);
+        }
+
+        .calc-result-pill {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(16, 185, 129, 0.15));
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .calc-result-pill .label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+        }
+
+        .calc-result-pill .val {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--electric-cyan);
+            font-family: var(--font-mono);
+        }
+
+        /* Section Titles */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 0.75rem;
+        }
+
+        .section-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-header .tagline {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* Lessons Grid */
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (min-width: 768px) {
+            .lessons-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .grid-full-width {
+                grid-column: span 2;
+            }
+        }
+
+        /* Lesson Card Design */
+        .lesson-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .lesson-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--card-color, var(--electric-cyan)), var(--card-color-2, var(--neon-purple)));
+            opacity: 0.7;
+            transition: height 0.3s ease, opacity 0.3s ease;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-6px);
+            background: var(--bg-card-hover);
+            border-color: var(--border-hover);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 189, 248, 0.15);
+        }
+
+        .lesson-card:hover::before {
+            height: 6px;
+            opacity: 1;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+        }
+
+        .lesson-badge {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.35rem 0.8rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--card-color, var(--electric-cyan));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--card-color, var(--electric-cyan));
+            transition: transform 0.3s ease;
+        }
+
+        .lesson-card:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .lesson-title {
+            font-size: 1.45rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+
+        .lesson-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.55;
+            flex-grow: 1;
+        }
+
+        .key-concepts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .concept-pill {
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.25rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .sim-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--neon-emerald);
+            font-weight: 600;
+        }
+
+        .sim-indicator i {
+            font-size: 0.75rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.65rem 1.25rem;
+            background: linear-gradient(135deg, var(--card-color, var(--electric-cyan)), var(--card-color-2, var(--neon-purple)));
+            color: #090d16;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .lesson-card:hover .btn-action {
+            transform: translateX(3px);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        /* Color Themes for Cards */
+        .theme-cyan {
+            --card-color: #00f2fe;
+            --card-color-2: #38bdf8;
+        }
+        .theme-amber {
+            --card-color: #fbbf24;
+            --card-color-2: #f59e0b;
+        }
+        .theme-purple {
+            --card-color: #c084fc;
+            --card-color-2: #a855f7;
+        }
+        .theme-emerald {
+            --card-color: #34d399;
+            --card-color-2: #10b981;
+        }
+        .theme-rose {
+            --card-color: #fb7185;
+            --card-color-2: #f43f5e;
+        }
+        .theme-violet {
+            --card-color: #818cf8;
+            --card-color-2: #6366f1;
+        }
+
+        /* Interactive Circuit Animation in Hub Footer */
+        .circuit-footer-banner {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .circuit-footer-banner h3 {
+            font-size: 1.3rem;
+            color: var(--electric-cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .feature-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .feature-box {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .feature-box i {
+            color: var(--electric-blue);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .feature-box h4 {
+            font-size: 0.95rem;
+            color: #fff;
+            margin-bottom: 0.25rem;
+        }
+
+        .feature-box p {
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-top: 3rem;
+            font-family: var(--font-mono);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <a href="../README.md" class="back-link">
+                <i class="fa-solid fa-arrow-left"></i> Voltar ao Repositório Principal
+            </a>
+            <div class="uni-badge">
+                <i class="fa-solid fa-bolt"></i> UNIFESP ICT • Circuitos Elétricos I
+            </div>
+        </nav>
+
+        <!-- Hero Header -->
+        <header class="hero">
+            <div class="hero-pill">
+                <i class="fa-solid fa-microchip"></i> Plataforma Interativa de Aprendizagem
+            </div>
+            <h1>Circuitos Elétricos I</h1>
+            <p class="hero-desc">
+                Aulas visuais, conceitos teóricos fundamentais, simuladores em tempo real de elétrons e grandezas elétricas, e listas de exercícios resolvidas passo a passo.
+            </p>
+            <div class="author-tag">
+                <i class="fa-solid fa-graduation-cap"></i> Material baseado no curso do <strong>Prof. Henrique Amorim</strong> (UNIFESP - ICT)
+            </div>
+        </header>
+
+        <!-- Ohm's Law Fast Interactive Calculator Widget -->
+        <div class="ohm-widget-card">
+            <div class="ohm-widget-info">
+                <h3><i class="fa-solid fa-calculator"></i> Calculadora Rápida da Lei de Ohm</h3>
+                <p>Altere os valores de $V$ e $R$ para calcular instantaneamente a Corrente $I$ e a Potência $P$ dissipada.</p>
+            </div>
+            <div class="ohm-calc-group">
+                <div class="calc-input-box">
+                    <label>Tensão (V)</label>
+                    <input type="number" id="quickV" value="12" step="0.5" oninput="updateQuickCalc()">
+                </div>
+                <div class="calc-input-box">
+                    <label>Resistência (Ω)</label>
+                    <input type="number" id="quickR" value="4" step="0.5" min="0.1" oninput="updateQuickCalc()">
+                </div>
+                <div class="calc-result-pill">
+                    <div class="label">Corrente (i = V/R)</div>
+                    <div class="val" id="quickI">3.00 A</div>
+                </div>
+                <div class="calc-result-pill">
+                    <div class="label">Potência (P = V·i)</div>
+                    <div class="val" id="quickP" style="color: var(--neon-amber);">36.00 W</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lessons Section -->
+        <div class="section-header">
+            <h2><i class="fa-solid fa-layer-group" style="color: var(--electric-cyan);"></i> Módulos & Aulas Interativas</h2>
+            <span class="tagline">Teoria + Simuladores + Quizzes Imediatos</span>
+        </div>
+
+        <div class="lessons-grid">
+            
+            <!-- Module 1: Conceitos Fundamentais I -->
+            <a href="lessons/0001-conceitos-fundamentais.html" class="lesson-card theme-cyan">
+                <div>
+                    <div class="card-top">
+                        <div class="lesson-badge">
+                            <i class="fa-solid fa-atom"></i> Módulo 01 • Aula 2
+                        </div>
+                        <div class="card-icon">
+                            <i class="fa-solid fa-bolt-lightning"></i>
+                        </div>
+                    </div>
+                    <h3 class="lesson-title">Conceitos Fundamentais I: Carga, Tensão & Potência</h3>
+                    <p class="lesson-desc">
+                        Entenda o modelo atômico da carga elétrica ($1.6 \times 10^{-19}\text{ C}$), o fluxo ordenado de elétrons ($i = dq/dt$), a densidade de energia ($v = dw/dq$), convenção passiva de sinais e conservação de potência ($\sum P = 0$).
+                    </p>
+                    <div class="key-concepts">
+                        <span class="concept-pill">Carga Elementar</span>
+                        <span class="concept-pill">Sentido Real x Convencional</span>
+                        <span class="concept-pill">Convenção Passiva</span>
+                        <span class="concept-pill">Integral de Energia</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="sim-indicator">
+                        <i class="fa-solid fa-circle"></i> Simulador de Elétrons & Bipolos
+                    </div>
+                    <span class="btn-action">Acessar Aula <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Module 2: Conceitos Fundamentais II & Lei de Ohm -->
+            <a href="lessons/0002-lei-de-ohm-fontes.html" class="lesson-card theme-amber">
+                <div>
+                    <div class="card-top">
+                        <div class="lesson-badge">
+                            <i class="fa-solid fa-wave-square"></i> Módulo 02 • Aula 3
+                        </div>
+                        <div class="card-icon">
+                            <i class="fa-solid fa-car-battery"></i>
+                        </div>
+                    </div>
+                    <h3 class="lesson-title">Fontes Ideais, Dependentes & Lei de Ohm</h3>
+                    <p class="lesson-desc">
+                        Aprenda modelos de fontes ideais e dependentes (FTCT, FTCC, FCCT, FCCC), 1ª e 2ª Leis de Ohm ($R = \rho l/A$), curto-circuito vs circuito aberto, curvas I-V e dimensionamento de resistores para cargas reais.
+                    </p>
+                    <div class="key-concepts">
+                        <span class="concept-pill">Fontes Dependentes</span>
+                        <span class="concept-pill">2ª Lei de Ohm (ρ·l/A)</span>
+                        <span class="concept-pill">Curvas I-V</span>
+                        <span class="concept-pill">Roda da Lei de Ohm</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="sim-indicator">
+                        <i class="fa-solid fa-circle"></i> Simulador I-V & Roda de Ohm
+                    </div>
+                    <span class="btn-action">Acessar Aula <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Module 3: Topologia de Redes & Leis de Kirchhoff -->
+            <a href="lessons/0003-leis-de-kirchhoff.html" class="lesson-card theme-purple">
+                <div>
+                    <div class="card-top">
+                        <div class="lesson-badge">
+                            <i class="fa-solid fa-network-wired"></i> Módulo 03 • Aula 4
+                        </div>
+                        <div class="card-icon">
+                            <i class="fa-solid fa-diagram-project"></i>
+                        </div>
+                    </div>
+                    <h3 class="lesson-title">Topologia de Redes & Leis de Kirchhoff</h3>
+                    <p class="lesson-desc">
+                        Domine Ramos ($b$), Nós ($n$) e Laços ($l$) com o teorema $b = l + n - 1$. Aplique LKC para correntes nos nós, LKT para tensões nas malhas e simplifique associações em série e paralelo.
+                    </p>
+                    <div class="key-concepts">
+                        <span class="concept-pill">Topologia b = l + n - 1</span>
+                        <span class="concept-pill">LKC (Nós)</span>
+                        <span class="concept-pill">LKT (Malhas)</span>
+                        <span class="concept-pill">Req Série / Paralelo</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="sim-indicator">
+                        <i class="fa-solid fa-circle"></i> Grafo & Simulador de Malhas
+                    </div>
+                    <span class="btn-action">Acessar Aula <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Module 4: Divisores de Tensão e Corrente -->
+            <a href="lessons/0004-divisores-tensao-corrente.html" class="lesson-card theme-emerald">
+                <div>
+                    <div class="card-top">
+                        <div class="lesson-badge">
+                            <i class="fa-solid fa-arrows-split-up-and-left"></i> Módulo 04 • Aula 5
+                        </div>
+                        <div class="card-icon">
+                            <i class="fa-solid fa-sliders"></i>
+                        </div>
+                    </div>
+                    <h3 class="lesson-title">Divisores de Tensão, Corrente & Efeito de Carga</h3>
+                    <p class="lesson-desc">
+                        Calcule divisores de tensão ($v_j = \frac{R_j}{R_{eq}} v_s$) e de corrente ($i_1 = \frac{R_2}{R_1+R_2} i_s$), entenda o curto-circuito em paralelo ($R_x \parallel 0 = 0$) e o efeito de conectar uma carga $R_L$.
+                    </p>
+                    <div class="key-concepts">
+                        <span class="concept-pill">Divisor de Tensão</span>
+                        <span class="concept-pill">Divisor de Corrente</span>
+                        <span class="concept-pill">Curto em Paralelo</span>
+                        <span class="concept-pill">Efeito de Carga RL</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="sim-indicator">
+                        <i class="fa-solid fa-circle"></i> Bancada de Divisores Dinâmica
+                    </div>
+                    <span class="btn-action">Acessar Aula <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Module 5: Laboratório Virtual de Bancada -->
+            <a href="lessons/0005-laboratorio-virtual.html" class="lesson-card theme-violet">
+                <div>
+                    <div class="card-top">
+                        <div class="lesson-badge">
+                            <i class="fa-solid fa-flask-vial"></i> Módulo 05 • Laboratório
+                        </div>
+                        <div class="card-icon">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </div>
+                    </div>
+                    <h3 class="lesson-title">Bancada Virtual: Multímetro, Sinais & Chaveamento</h3>
+                    <p class="lesson-desc">
+                        Ambiente interativo de experimentação estilo EveryCircuit: meça tensões em paralelo e correntes em série com pontas de prova, altere chaves, observe lâmpadas acenderem e analise formas de onda.
+                    </p>
+                    <div class="key-concepts">
+                        <span class="concept-pill">Multímetro Virtual (V/A/Ω)</span>
+                        <span class="concept-pill">Pontas de Prova</span>
+                        <span class="concept-pill">Simulação Dinâmica</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="sim-indicator">
+                        <i class="fa-solid fa-circle"></i> Bancada Completa
+                    </div>
+                    <span class="btn-action">Entrar no Lab <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Module 6: Central de Exercícios Resolvidos UNIFESP -->
+            <a href="lessons/0006-exercicios-resolvidos.html" class="lesson-card theme-rose">
+                <div>
+                    <div class="card-top">
+                        <div class="lesson-badge">
+                            <i class="fa-solid fa-pen-ruler"></i> Módulo 06 • Provas & Exercícios
+                        </div>
+                        <div class="card-icon">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                    </div>
+                    <h3 class="lesson-title">Central de Exercícios Resolvidos & Desafios</h3>
+                    <p class="lesson-desc">
+                        Todos os exercícios das Aulas 2, 3, 4 e 5 da UNIFESP com inputs auto-corrigíveis, dicas guiadas, cálculo passo a passo de balanço de potência de 8 bipolos, escada de resistores e fontes controladas.
+                    </p>
+                    <div class="key-concepts">
+                        <span class="concept-pill">Exercícios UNIFESP ICT</span>
+                        <span class="concept-pill">Correção Imediata</span>
+                        <span class="concept-pill">Resoluções Passo a Passo</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="sim-indicator">
+                        <i class="fa-solid fa-circle"></i> Teste Seus Conhecimentos
+                    </div>
+                    <span class="btn-action">Resolver Exercícios <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Module 7: Instrumentos de Medição, Ponte de Wheatstone & Strain Gage -->
+            <a href="lessons/0007-instrumentos-medicao-wheatstone.html" class="lesson-card theme-amber">
+                <div>
+                    <div class="card-top">
+                        <div class="lesson-badge">
+                            <i class="fa-solid fa-gauge-high"></i> Módulo 07 • Aulas 7 & 8
+                        </div>
+                        <div class="card-icon">
+                            <i class="fa-solid fa-weight-scale"></i>
+                        </div>
+                    </div>
+                    <h3 class="lesson-title">Instrumentos de Medição, Wheatstone & Strain Gage</h3>
+                    <p class="lesson-desc">
+                        Galvanômetro d'Arsonval, resistores limitadores ($R_L$ e shunt), sensibilidade ($\Omega/\text{V}$), erro sistemático e efeito de carga. Dedução da Ponte de Wheatstone equilibrada e estudo de caso completo do sensor Strain Gage com amplificador de instrumentação.
+                    </p>
+                    <div class="key-concepts">
+                        <span class="concept-pill">Galvanômetro d'Arsonval</span>
+                        <span class="concept-pill">Sensibilidade (Ω/V)</span>
+                        <span class="concept-pill">Ponte de Wheatstone</span>
+                        <span class="concept-pill">Sensor Strain Gage</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="sim-indicator">
+                        <i class="fa-solid fa-circle"></i> Simulador de Ponte & Deformação
+                    </div>
+                    <span class="btn-action">Acessar Aula <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Module 8: Transformação Estrela-Triângulo (Y-Δ) -->
+            <a href="lessons/0008-transformacao-estrela-triangulo.html" class="lesson-card theme-emerald">
+                <div>
+                    <div class="card-top">
+                        <div class="lesson-badge">
+                            <i class="fa-solid fa-shapes"></i> Módulo 08 • Aula 9
+                        </div>
+                        <div class="card-icon">
+                            <i class="fa-solid fa-arrows-split-up-and-left"></i>
+                        </div>
+                    </div>
+                    <h3 class="lesson-title">Transformação Estrela-Triângulo (Y-Δ e Δ-Y)</h3>
+                    <p class="lesson-desc">
+                        Dedução da equivalência a 3 terminais, fórmulas diretas e inversas com regras mnemônicas, e o Método Gráfico Canônico em 9 Etapas do Prof. Amorim com visualizador interativo passo a passo para simplificar pontes desbalanceadas.
+                    </p>
+                    <div class="key-concepts">
+                        <span class="concept-pill">Equivalência a 3 Terminais</span>
+                        <span class="concept-pill">Método Gráfico 9 Etapas</span>
+                        <span class="concept-pill">Fórmulas Δ-Y e Y-Δ</span>
+                        <span class="concept-pill">Pontes Desbalanceadas</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="sim-indicator">
+                        <i class="fa-solid fa-circle"></i> Diagrama Interativo 9 Etapas
+                    </div>
+                    <span class="btn-action">Acessar Aula <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Module 9: Método das Tensões dos Nós & Supernó -->
+            <a href="lessons/0009-metodo-tensoes-dos-nos.html" class="lesson-card theme-cyan">
+                <div>
+                    <div class="card-top">
+                        <div class="lesson-badge">
+                            <i class="fa-solid fa-circle-nodes"></i> Módulo 09 • Aulas 10 & 11
+                        </div>
+                        <div class="card-icon">
+                            <i class="fa-solid fa-network-wired"></i>
+                        </div>
+                    </div>
+                    <h3 class="lesson-title">Método das Tensões dos Nós & Supernó</h3>
+                    <p class="lesson-desc">
+                        Topologia sistemática ($n_e - 1$ equações), convenção algébrica de correntes saindo dos nós, demonstração do Teorema de Tellegen ($\sum P = 0$), análise com inversão de referência, fontes dependentes e o Teorema do Supernó.
+                    </p>
+                    <div class="key-concepts">
+                        <span class="concept-pill">Nós Essenciais (ne - 1)</span>
+                        <span class="concept-pill">Balanço Tellegen (∑P = 0)</span>
+                        <span class="concept-pill">Fontes Dependentes</span>
+                        <span class="concept-pill">Teorema do Supernó</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="sim-indicator">
+                        <i class="fa-solid fa-circle"></i> Solucionador Nodal Interativo
+                    </div>
+                    <span class="btn-action">Acessar Aula <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </a>
+
+            <!-- Module 10: Método das Correntes de Malha & Supermalha -->
+            <a href="lessons/0010-metodo-correntes-de-malha.html" class="lesson-card theme-purple">
+                <div>
+                    <div class="card-top">
+                        <div class="lesson-badge">
+                            <i class="fa-solid fa-arrows-spin"></i> Módulo 10 • Aula 12
+                        </div>
+                        <div class="card-icon">
+                            <i class="fa-solid fa-rotate"></i>
+                        </div>
+                    </div>
+                    <h3 class="lesson-title">Método das Correntes de Malha & Supermalha</h3>
+                    <p class="lesson-desc">
+                        Circuitos planares e correntes fictícias circulantes, ramos exclusivos vs compartilhados, simplificação por fonte de corrente no perímetro, equacionamento com fontes controladas, Teorema da Supermalha e quadro comparativo Supernó vs Supermalha.
+                    </p>
+                    <div class="key-concepts">
+                        <span class="concept-pill">Malhas Essenciais (LKT)</span>
+                        <span class="concept-pill">Sentido Horário Padronizado</span>
+                        <span class="concept-pill">A Supermalha</span>
+                        <span class="concept-pill">Supernó vs Supermalha</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="sim-indicator">
+                        <i class="fa-solid fa-circle"></i> Simulador de Malhas & Matrizes
+                    </div>
+                    <span class="btn-action">Acessar Aula <i class="fa-solid fa-chevron-right"></i></span>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Interactive Features Overview Banner -->
+        <div class="circuit-footer-banner">
+            <h3><i class="fa-solid fa-microchip"></i> Metodologia Visual e Tecnologias de Simulação</h3>
+            <div class="feature-points">
+                <div class="feature-box">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                    <h4>Simulação em Tempo Real</h4>
+                    <p>Mecanismo Canvas e SVG leve renderizando elétrons animados, polaridades e fluxos de corrente dinâmicos.</p>
+                </div>
+                <div class="feature-box">
+                    <i class="fa-solid fa-square-root-variable"></i>
+                    <h4>Rigor Matemático (LaTeX)</h4>
+                    <p>Fórmulas renderizadas com MathJax 3 idênticas às convenções e notações do Prof. Henrique Amorim.</p>
+                </div>
+                <div class="feature-box">
+                    <i class="fa-solid fa-check-double"></i>
+                    <h4>Autoavaliação Imediata</h4>
+                    <p>Quizzes interativos ao final de cada conceito com explicações detalhadas e passo a passo algébrico.</p>
+                </div>
+                <div class="feature-box">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                    <h4>Zero Atrito de Estudo</h4>
+                    <p>Interface intuitiva, direta ao ponto e pronta para rodar em qualquer navegador moderno no computador ou celular.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Circuitos Elétricos I • UNIFESP - Instituto de Ciência e Tecnologia (ICT) • Portal de Estudos Interativo
+        </footer>
+    </div>
+
+    <script>
+        function updateQuickCalc() {
+            const v = parseFloat(document.getElementById('quickV').value) || 0;
+            const r = parseFloat(document.getElementById('quickR').value) || 0.0001;
+            const i = v / r;
+            const p = v * i;
+            
+            document.getElementById('quickI').innerText = i.toFixed(2) + ' A';
+            document.getElementById('quickP').innerText = p.toFixed(2) + ' W';
+        }
+    </script>
+</body>
+</html>

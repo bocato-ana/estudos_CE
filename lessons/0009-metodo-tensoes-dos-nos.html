@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 09: Método das Tensões dos Nós & Supernó</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .node-badge {
+            background: rgba(0, 242, 254, 0.15);
+            border: 1px solid var(--electric-cyan);
+            color: var(--electric-cyan);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .supernode-bubble {
+            border: 2px dashed #f43f5e;
+            background: rgba(244, 63, 94, 0.08);
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        .interactive-circuit-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--electric-cyan);
+            border-color: rgba(0, 242, 254, 0.3);
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 242, 254, 0.15);
+            border-color: var(--electric-cyan);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.15);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .matrix-box {
+            background: #050811;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="nav-bar">
+                <a href="../index.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub Principal
+                </a>
+                <div class="lesson-badge-header">
+                    <i class="fa-solid fa-circle-nodes"></i> Aulas 10 & 11 • Prof. Henrique Amorim
+                </div>
+            </div>
+            <h1>Técnicas de Análise: Método das Tensões dos Nós & Supernó</h1>
+            <p class="subtitle">Topologia de Redes, Algoritmo Canônico em 5 Etapas, Balanço Energético ($\sum P = 0$), Fontes Dependentes e o Teorema do Supernó</p>
+        </header>
+
+        <!-- SEÇÃO 1: FUNDAMENTAÇÃO TOPOLÓGICA -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-diagram-project"></i> Topologia de Redes</div>
+            <h2>1. Topologia e Independência de Equações</h2>
+            <p>
+                Para resolver um circuito elétrico de forma sistemática sem redundâncias, a topologia de circuitos estabelece distinções cruciais entre nós comuns e nós essenciais:
+            </p>
+
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-code-commit" style="color: var(--electric-cyan);"></i> Nós e Ramos Essenciais</h4>
+                    <ul style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 1.2rem;">
+                        <li style="margin-bottom: 0.4rem;"><strong>Nó Comum ($n$):</strong> Ponto de conexão de 2 ou mais bipolos.</li>
+                        <li style="margin-bottom: 0.4rem;"><strong>Nó Essencial ($n_e$):</strong> Ponto de junção onde <strong>3 ou mais elementos</strong> se conectam.</li>
+                        <li style="margin-bottom: 0.4rem;"><strong>Ramo ($b$):</strong> Trecho contendo um único bipolo.</li>
+                        <li><strong>Ramo Essencial ($b_e$):</strong> Caminho entre dois nós essenciais sem nós essenciais intermediários.</li>
+                    </ul>
+                </div>
+
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-calculator" style="color: var(--neon-purple);"></i> Teorema do Número de Equações</h4>
+                    <div class="formula-body" style="font-size: 1.3rem; color: var(--electric-cyan);">
+                        $$\text{Equações LKC necessárias} = n_e - 1$$
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-dim); text-align: center;">
+                        Se equacionarmos todos os $n_e$ nós, a última equação será uma combinação linear das anteriores (redundante). Escolhendo 1 nó como referência (0V), restam exatamente $n_e - 1$ incógnitas independentes!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: O MANUAL EM 5 ETAPAS -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-list-check"></i> Algoritmo do Prof. Amorim</div>
+            <h2>2. O Método Nodal Canônico em 5 Etapas</h2>
+            <p>
+                O Prof. Henrique Amorim sintetiza o método em cinco passos lógicos rigorosos:
+            </p>
+
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <span class="node-badge">Passo 1</span>
+                    <h4 style="margin-top: 0.5rem;">Identificar os Nós Essenciais</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        Conte quantos nós unem 3 ou mais ramos. O sistema terá exatamente $n_e - 1$ equações.
+                    </p>
+                </div>
+                <div class="card-panel">
+                    <span class="node-badge">Passo 2</span>
+                    <h4 style="margin-top: 0.5rem;">Arbitrar o Nó de Referência (Terra)</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        Defina o nó com maior número de ramos conectados como nó de referência ($\nabla = 0\,\text{V}$). Isso anula termos e maximiza condutâncias na matriz.
+                    </p>
+                </div>
+                <div class="card-panel">
+                    <span class="node-badge">Passo 3</span>
+                    <h4 style="margin-top: 0.5rem;">Definir as Tensões de Nó</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        Defina $v_1, v_2, \dots, v_{n-1}$ como as <strong>elevações de potencial</strong> de cada nó essencial em relação ao nó de referência.
+                    </p>
+                </div>
+                <div class="card-panel">
+                    <span class="node-badge">Passo 4</span>
+                    <h4 style="margin-top: 0.5rem;">Padronização de Correntes: SAEM do Nó</h4>
+                    <p style="font-size: 0.88rem; color: var(--text-secondary);">
+                        <strong>Convenção Padrão de Ouro:</strong> Em cada nó analisado, assuma que todas as correntes dos resistores <strong>SAEM do nó</strong>:
+                        $$i_{\text{ramo}} = \frac{v_{\text{nó local}} - v_{\text{nó vizinho}}}{R}$$
+                    </p>
+                </div>
+            </div>
+
+            <div class="alert-box alert-info">
+                <i class="fa-solid fa-check-double"></i>
+                <div>
+                    <strong>Passo 5: Montar e Resolver o Sistema Linear:</strong><br>
+                    $$\sum i_{\text{que saem}} = 0 \iff [G] \cdot [V] = [I_{\text{fontes}}]$$
+                    Onde $[G]$ é a matriz simétrica de condutâncias, $[V]$ o vetor de potenciais nodais e $[I_{\text{fontes}}]$ o vetor de correntes injetadas por fontes.
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: EXEMPLO 1 RESOLVIDO PASSO A PASSO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-play"></i> Exemplo Guiado 1</div>
+            <h2>3. Circuito com 2 Nós Essenciais e Duas Fontes</h2>
+            <p>
+                Considere o circuito dos slides: Fonte de tensão de $10\,\text{V}$, resistores de $1\,\Omega, 2\,\Omega, 5\,\Omega, 10\,\Omega$ e fonte de corrente independente de $2\,\text{A}$:
+            </p>
+
+            <div class="interactive-circuit-tabs">
+                <button class="tab-btn active" onclick="switchEx1Tab(1)">1. Identificação Topológica</button>
+                <button class="tab-btn" onclick="switchEx1Tab(2)">2. Equação do Nó $N_a$</button>
+                <button class="tab-btn" onclick="switchEx1Tab(3)">3. Equação do Nó $N_b$</button>
+                <button class="tab-btn" onclick="switchEx1Tab(4)">4. Resolução Numérica</button>
+            </div>
+
+            <div id="ex1Tab1" class="tab-content active">
+                <div class="circuit-svg-box">
+                    <svg viewBox="0 0 650 220" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Fio inferior terra -->
+                        <line x1="80" y1="180" x2="570" y2="180" stroke="#38bdf8" stroke-width="3"/>
+                        <!-- Símbolo de terra -->
+                        <line x1="325" y1="180" x2="325" y2="195" stroke="#38bdf8" stroke-width="2"/>
+                        <line x1="315" y1="195" x2="335" y2="195" stroke="#38bdf8" stroke-width="2"/>
+                        <line x1="320" y1="200" x2="330" y2="200" stroke="#38bdf8" stroke-width="2"/>
+                        <text x="325" y="215" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle">Terra (0V)</text>
+
+                        <!-- Ramo 1: Fonte 10V + R1 1Ω -->
+                        <line x1="80" y1="180" x2="80" y2="60" stroke="#38bdf8" stroke-width="2.5"/>
+                        <circle cx="80" cy="120" r="18" fill="#090d16" stroke="#00f2fe" stroke-width="2"/>
+                        <text x="80" y="117" fill="#fff" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">+</text>
+                        <text x="80" y="130" fill="#fff" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">-</text>
+                        <text x="50" y="125" fill="#00f2fe" font-family="'JetBrains Mono'" font-size="11" font-weight="bold">10V</text>
+                        <line x1="80" y1="60" x2="230" y2="60" stroke="#38bdf8" stroke-width="2.5"/>
+                        <rect x="130" y="48" width="50" height="24" fill="#121a2c" stroke="#38bdf8" stroke-width="2" rx="4"/>
+                        <text x="155" y="64" fill="#fff" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle">1Ω</text>
+
+                        <!-- Nó Na (v1) -->
+                        <circle cx="230" cy="60" r="6" fill="#f43f5e"/>
+                        <text x="230" y="40" fill="#f43f5e" font-family="'JetBrains Mono'" font-size="14" font-weight="bold" text-anchor="middle">N_a (v1)</text>
+
+                        <!-- Resistor 5Ω descendo de Na -->
+                        <line x1="230" y1="60" x2="230" y2="180" stroke="#38bdf8" stroke-width="2.5"/>
+                        <rect x="218" y="100" width="24" height="45" fill="#121a2c" stroke="#38bdf8" stroke-width="2" rx="4"/>
+                        <text x="255" y="127" fill="#fff" font-family="'JetBrains Mono'" font-size="11">5Ω</text>
+
+                        <!-- Resistor 2Ω ligando Na a Nb -->
+                        <line x1="230" y1="60" x2="420" y2="60" stroke="#38bdf8" stroke-width="2.5"/>
+                        <rect x="305" y="48" width="50" height="24" fill="#121a2c" stroke="#38bdf8" stroke-width="2" rx="4"/>
+                        <text x="330" y="64" fill="#fff" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle">2Ω</text>
+
+                        <!-- Nó Nb (v2) -->
+                        <circle cx="420" cy="60" r="6" fill="#f59e0b"/>
+                        <text x="420" y="40" fill="#f59e0b" font-family="'JetBrains Mono'" font-size="14" font-weight="bold" text-anchor="middle">N_b (v2)</text>
+
+                        <!-- Resistor 10Ω descendo de Nb -->
+                        <line x1="420" y1="60" x2="420" y2="180" stroke="#38bdf8" stroke-width="2.5"/>
+                        <rect x="408" y="100" width="24" height="45" fill="#121a2c" stroke="#38bdf8" stroke-width="2" rx="4"/>
+                        <text x="445" y="127" fill="#fff" font-family="'JetBrains Mono'" font-size="11">10Ω</text>
+
+                        <!-- Ramo da Fonte de Corrente 2A -->
+                        <line x1="420" y1="60" x2="570" y2="60" stroke="#38bdf8" stroke-width="2.5"/>
+                        <line x1="570" y1="60" x2="570" y2="180" stroke="#38bdf8" stroke-width="2.5"/>
+                        <circle cx="570" cy="120" r="18" fill="#090d16" stroke="#10b981" stroke-width="2"/>
+                        <line x1="570" y1="130" x2="570" y2="110" stroke="#10b981" stroke-width="2.5"/>
+                        <polygon points="570,108 565,116 575,116" fill="#10b981"/>
+                        <text x="600" y="125" fill="#10b981" font-family="'JetBrains Mono'" font-size="12" font-weight="bold">2A</text>
+                    </svg>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                    Temos $n_e = 3$ nós essenciais ($N_a, N_b$ e a barra inferior $N_c$). Fixamos $N_c = 0\,\text{V}$. Portanto, teremos exatamente <strong>$3 - 1 = 2$ equações nodais</strong>.
+                </p>
+            </div>
+
+            <div id="ex1Tab2" class="tab-content">
+                <div class="formula-card">
+                    <div class="formula-header">
+                        <span class="formula-title">LKC no Nó $N_a$ (Correntes Saindo)</span>
+                    </div>
+                    <div class="formula-body">
+                        $$\underbrace{\frac{v_1 - 10}{1}}_{i_1 \text{ (para esq.)}} + \underbrace{\frac{v_1 - v_2}{2}}_{i_2 \text{ (para dir.)}} + \underbrace{\frac{v_1 - 0}{5}}_{i_3 \text{ (para baixo)}} = 0$$
+                    </div>
+                    <div class="formula-desc">
+                        Agrupando os coeficientes de $v_1$ e $v_2$:
+                        $$v_1 \cdot \left(\frac{1}{1} + \frac{1}{2} + \frac{1}{5}\right) + v_2 \cdot \left(-\frac{1}{2}\right) = \frac{10}{1}$$
+                        $$v_1 \cdot (1 + 0{,}5 + 0{,}2) - 0{,}5 v_2 = 10 \implies \mathbf{1{,}7 \cdot v_1 - 0{,}5 \cdot v_2 = 10} \quad \text{(Eq. 1)}$$
+                    </div>
+                </div>
+            </div>
+
+            <div id="ex1Tab3" class="tab-content">
+                <div class="formula-card" style="border-left-color: var(--neon-amber);">
+                    <div class="formula-header">
+                        <span class="formula-title">LKC no Nó $N_b$ (Correntes Saindo)</span>
+                    </div>
+                    <div class="formula-body">
+                        $$\underbrace{\frac{v_2 - v_1}{2}}_{i_4 \text{ (para esq.)}} + \underbrace{\frac{v_2 - 0}{10}}_{i_6 \text{ (para baixo)}} + \underbrace{(-2)}_{i_5 \text{ (entra 2A)}} = 0$$
+                    </div>
+                    <div class="formula-desc">
+                        Agrupando os termos:
+                        $$v_1 \cdot \left(-\frac{1}{2}\right) + v_2 \cdot \left(\frac{1}{2} + \frac{1}{10}\right) = 2$$
+                        $$\mathbf{-0{,}5 \cdot v_1 + 0{,}6 \cdot v_2 = 2} \quad \text{(Eq. 2)}$$
+                    </div>
+                </div>
+            </div>
+
+            <div id="ex1Tab4" class="tab-content">
+                <div class="matrix-box">
+                    $$\begin{bmatrix} 1{,}7 & -0{,}5 \\ -0{,}5 & 0{,}6 \end{bmatrix} \begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} 10 \\ 2 \end{bmatrix}$$
+                </div>
+                <div class="formula-card" style="border-left-color: var(--neon-emerald);">
+                    <div class="formula-header">
+                        <span class="formula-title">Solução Numérica do Sistema</span>
+                    </div>
+                    <div class="formula-body" style="color: var(--neon-emerald); font-size: 1.3rem;">
+                        $$v_1 = \mathbf{9{,}091\,\text{V}} \qquad v_2 = \mathbf{10{,}91\,\text{V}}$$
+                    </div>
+                    <div class="formula-desc">
+                        Valores conferem rigorosamente com a simulação do Slide 12!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: BALANÇO DE POTÊNCIA -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-scale-balanced"></i> Princípio da Conservação</div>
+            <h2>4. Teorema de Tellegen: Prova de Balanço de Potência ($\sum P = 0$)</h2>
+            <p>
+                <strong>Exercício da UNIFESP:</strong> Em um circuito com fonte de $50\,\text{V}$, fonte de corrente de $3\,\text{A}$ e resistores de $5\,\Omega, 10\,\Omega, 40\,\Omega$, prove que a potência total líquida é identicamente zero.
+            </p>
+
+            <div class="formula-card">
+                <div class="formula-body">
+                    $$\frac{v_1 - 50}{5} + \frac{v_1}{10} + \frac{v_1}{40} - 3 = 0 \implies v_1 \left(0{,}2 + 0{,}1 + 0{,}025\right) = 10 + 3 \implies 0{,}325 \cdot v_1 = 13 \implies \mathbf{v_1 = 40\,\text{V}}$$
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Elemento</th>
+                        <th>Tensão nos Terminais ($V$)</th>
+                        <th>Corrente ($I$)</th>
+                        <th>Cálculo da Potência</th>
+                        <th>Papel no Circuito</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Fonte de 50V</strong></td>
+                        <td>$50\,\text{V}$</td>
+                        <td>$i = \frac{50 - 40}{5} = 2\,\text{A}$ saindo pelo polo $+$</td>
+                        <td>$P = -50 \cdot 2 = \mathbf{-100\,\text{W}}$</td>
+                        <td><span style="color: var(--neon-emerald);"><i class="fa-solid fa-arrow-up"></i> Fornecendo</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fonte de 3A</strong></td>
+                        <td>$v_1 = 40\,\text{V}$</td>
+                        <td>$3\,\text{A}$ saindo pelo terminal positivo</td>
+                        <td>$P = -3 \cdot 40 = \mathbf{-120\,\text{W}}$</td>
+                        <td><span style="color: var(--neon-emerald);"><i class="fa-solid fa-arrow-up"></i> Fornecendo</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Resistor 5Ω</strong></td>
+                        <td>$\Delta V = 50 - 40 = 10\,\text{V}$</td>
+                        <td>$2\,\text{A}$</td>
+                        <td>$P = 10^2 / 5 = \mathbf{+20\,\text{W}}$</td>
+                        <td><span style="color: var(--neon-rose);"><i class="fa-solid fa-arrow-down"></i> Dissipando</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Resistor 10Ω</strong></td>
+                        <td>$40\,\text{V}$</td>
+                        <td>$4\,\text{A}$</td>
+                        <td>$P = 40^2 / 10 = \mathbf{+160\,\text{W}}$</td>
+                        <td><span style="color: var(--neon-rose);"><i class="fa-solid fa-arrow-down"></i> Dissipando</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Resistor 40Ω</strong></td>
+                        <td>$40\,\text{V}$</td>
+                        <td>$1\,\text{A}$</td>
+                        <td>$P = 40^2 / 40 = \mathbf{+40\,\text{W}}$</td>
+                        <td><span style="color: var(--neon-rose);"><i class="fa-solid fa-arrow-down"></i> Dissipando</span></td>
+                    </tr>
+                    <tr style="background: rgba(16, 185, 129, 0.1); font-weight: bold;">
+                        <td colspan="3"><strong>SOMA TOTAL ($\sum P$)</strong></td>
+                        <td colspan="2" style="color: var(--neon-emerald); font-size: 1.1rem;">
+                            $-100 - 120 + 20 + 160 + 40 = \mathbf{0{,}00\,\text{W}}$ (Q.E.D.)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SEÇÃO 5: O SUPERNÓ -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-bolt-lightning"></i> Caso Especial Crítico</div>
+            <h2>5. O Supernó: Fonte de Tensão Entre Nós Essenciais</h2>
+            
+            <div class="supernode-bubble">
+                <h3 style="color: var(--neon-rose); margin-top: 0;"><i class="fa-solid fa-circle-exclamation"></i> O Problema do Nó Individual</h3>
+                <p style="font-size: 0.95rem;">
+                    Quando uma fonte de tensão (independente ou controlada) está ligada diretamente entre dois nós essenciais que <strong>não são o nó de referência</strong>:
+                    $$\text{Corrente pelo ramo da fonte } i = \frac{\Delta V}{R_{\text{fio}}} = \frac{\Delta V}{0} \implies \text{Indeterminação Matemático-Física!}$$
+                    Não podemos escrever a equação de ramo pela Lei de Ohm convencional.
+                </p>
+            </div>
+
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-link" style="color: var(--electric-cyan);"></i> Passo 1: Equação de Restrição</h4>
+                    <p style="font-size: 0.9rem;">
+                        A fonte fixa uma diferença de potencial rígida entre os nós $v_1$ e $v_2$:
+                        $$-v_1 - V_s + v_2 = 0 \implies \mathbf{v_2 - v_1 = V_s}$$
+                    </p>
+                </div>
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-circle-nodes" style="color: var(--neon-rose);"></i> Passo 2: Superfície do Supernó</h4>
+                    <p style="font-size: 0.9rem;">
+                        Abraçamos os nós $v_1$, $v_2$ e a fonte de tensão dentro de uma superfície fechada única. Aplicamos a LKC somando todas as correntes que emergem de ambos os nós:
+                        $$\sum i_{\text{saindo do nó 1}} + \sum i_{\text{saindo do nó 2}} = 0$$
+                    </p>
+                </div>
+            </div>
+
+            <h3>Exemplo Resolvido do Slide (Supernó com Fonte de 40V):</h3>
+            <div class="formula-card">
+                <div class="formula-body" style="font-size: 1rem; text-align: left;">
+                    Circuito com fonte de corrente $50\,\text{mA}$, $R_1 = 8\,\text{k}\Omega$, $R_2 = 20\,\text{k}\Omega$, $R_3 = 6\,\text{k}\Omega + 4\,\text{k}\Omega = 10\,\text{k}\Omega$ e fonte flutuante de $40\,\text{V}$:<br><br>
+                    <strong>Equação de Restrição:</strong> $v_2 = v_1 + 40$<br>
+                    <strong>LKC no Supernó ($N_1 \cup N_2$):</strong>
+                    $$-0{,}05 + \frac{v_1}{8\,\text{k}} + \frac{v_2}{20\,\text{k}} + \frac{v_2}{10\,\text{k}} = 0$$
+                    Substituindo $v_2 = v_1 + 40$:
+                    $$v_1 \cdot \left(\frac{1}{8000}\right) + (v_1 + 40) \cdot \left(\frac{1}{20000} + \frac{1}{10000}\right) = 0{,}05$$
+                    $$v_1 \cdot (0{,}000125 + 0{,}000150) + 40 \cdot 0{,}000150 = 0{,}05$$
+                    $$0{,}000275 \cdot v_1 + 0{,}006 = 0{,}05 \implies 0{,}000275 \cdot v_1 = 0{,}044$$
+                    $$\mathbf{v_1 = 160\,\text{V}} \qquad \mathbf{v_2 = 160 + 40 = 200\,\text{V}}$$
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 6: FONTE DEPENDENTE -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-microchip"></i> Fonte Controlada</div>
+            <h2>6. Circuito com Fonte Dependente (Slide 21 e 22)</h2>
+            <p>
+                <strong>Exercício:</strong> Circuito alimentado por fonte de $50\,\text{V}$, resistores de $6\,\Omega, 8\,\Omega, 2\,\Omega, 4\,\Omega$, fonte dependente de corrente $3 i_A$ e fonte de $5\,\text{A}$.
+            </p>
+            <div class="card-panel">
+                <h4><i class="fa-solid fa-code" style="color: var(--electric-cyan);"></i> Resolução Passo a Passo</h4>
+                <p style="font-size: 0.92rem;">
+                    1. Identifica-se a variável controladora $i_A$: Ela passa pelo resistor de $6\,\Omega$ da esquerda para a direita:<br>
+                    $$i_A = -i_{6\Omega} = \frac{50 - v_1}{6}$$
+                    2. LKC no nó $v_1$:
+                    $$\frac{v_1 - 50}{6} + \frac{v_1}{8} + \frac{v_1 - v_2}{2} - 3 \cdot \left(\frac{50 - v_1}{6}\right) = 0$$
+                    3. LKC no nó $v_2$:
+                    $$-5 + \frac{v_2}{4} + \frac{v_2 - v_1}{2} + 3 \cdot \left(\frac{50 - v_1}{6}\right) = 0$$
+                    Resolvendo o sistema linear resultante de duas equações:
+                    $$\mathbf{v_1 = 32\,\text{V}}, \quad \mathbf{v_2 = 16\,\text{V}}, \quad \mathbf{i_A = \frac{50 - 32}{6} = 3\,\text{A}}$$
+                </p>
+            </div>
+        </section>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="0008-transformacao-estrela-triangulo.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Aula 08: Transformação Y-Δ
+            </a>
+            <a href="0010-metodo-correntes-de-malha.html" class="nav-next-btn">
+                Próxima Aula: Método das Correntes de Malha & Supermalha <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function switchEx1Tab(tabIdx) {
+            document.querySelectorAll('.tab-btn').forEach((b, idx) => {
+                b.classList.toggle('active', idx === tabIdx - 1);
+            });
+            for (let i = 1; i <= 4; i++) {
+                const pane = document.getElementById('ex1Tab' + i);
+                if (pane) pane.classList.toggle('active', i === tabIdx);
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+    </script>
+</body>
+</html>

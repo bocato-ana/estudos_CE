@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 04: Divisores de Tensão, Corrente & Efeito de Carga</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="../assets/theme.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="nav-bar">
+                <a href="../index.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub Principal
+                </a>
+                <div class="lesson-badge-header">
+                    <i class="fa-solid fa-sliders"></i> Aula 5 • Prof. Henrique Amorim
+                </div>
+            </div>
+            <h1>Divisores de Tensão e de Corrente</h1>
+            <p class="subtitle">Fórmulas Fundamentais, Curto-Circuito em Paralelo e Efeito de Carga ($R_L$)</p>
+        </header>
+
+        <!-- SEÇÃO 1: DIVISOR DE TENSÃO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-bolt"></i> Associação em Série</div>
+            <h2>1. Divisor de Tensão</h2>
+            <p>
+                Quando resistores estão conectados <strong>em série</strong>, a mesma corrente atravessa todos eles. A tensão total se divide proporcionalmente ao valor ôhmico de cada resistor.
+            </p>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">Fórmula Geral do Divisor de Tensão</span>
+                </div>
+                <div class="formula-body">
+                    $$v_j = \frac{R_j}{R_{eq}} \cdot v_s = \frac{R_j}{R_1 + R_2 + \dots + R_n} \cdot v_s$$
+                </div>
+                <div class="formula-desc">
+                    A tensão no resistor $R_j$ é uma fração direta de sua resistência sobre a resistência equivalente total!
+                </div>
+            </div>
+
+            <!-- SIMULADOR 1: DIVISOR DE TENSÃO -->
+            <div class="sim-container">
+                <div class="sim-header">
+                    <div class="sim-title">
+                        <i class="fa-solid fa-gauge"></i> Bancada Interativa do Divisor de Tensão
+                    </div>
+                    <div class="stat-pill">Tensão na Saída $V_{out}$: <span id="vOutDisp">6.00 V</span></div>
+                </div>
+                <canvas id="canvasVDiv" class="sim-canvas"></canvas>
+                <div class="sim-controls">
+                    <div class="control-group">
+                        <label>Tensão da Fonte $V_s$ (V)</label>
+                        <input type="range" class="custom-slider" id="vdivVs" min="5" max="50" step="5" value="20" oninput="updateVDivSim()">
+                    </div>
+                    <div class="control-group">
+                        <label>Resistor Superior $R_1$ ($\text{k}\Omega$)</label>
+                        <input type="range" class="custom-slider" id="vdivR1" min="1" max="10" step="0.5" value="2" oninput="updateVDivSim()">
+                    </div>
+                    <div class="control-group">
+                        <label>Resistor Inferior $R_2$ ($\text{k}\Omega$)</label>
+                        <input type="range" class="custom-slider" id="vdivR2" min="1" max="10" step="0.5" value="3" oninput="updateVDivSim()">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: DIVISOR DE CORRENTE -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-arrows-split-up-and-left"></i> Associação em Paralelo</div>
+            <h2>2. Divisor de Corrente</h2>
+            <p>
+                Quando resistores estão conectados <strong>em paralelo</strong>, todos compartilham a mesma diferença de potencial. A corrente total se divide inversamente à resistência (a maior corrente flui pelo caminho de menor resistência).
+            </p>
+
+            <div class="formula-card" style="border-left-color: var(--electric-cyan);">
+                <div class="formula-header">
+                    <span class="formula-title">Divisor de Corrente para 2 Resistores em Paralelo</span>
+                </div>
+                <div class="formula-body">
+                    $$i_1 = \frac{R_2}{R_1 + R_2} \cdot i_s \quad \text{e} \quad i_2 = \frac{R_1}{R_1 + R_2} \cdot i_s$$
+                </div>
+                <div class="formula-desc">
+                    <strong>Atenção à Regra Prática:</strong> A corrente no resistor 1 tem no numerador o resistor <strong>oposto ($R_2$)</strong>!
+                </div>
+            </div>
+
+            <p>
+                Para uma associação de $n$ resistores em paralelo:
+            </p>
+            <div class="formula-card" style="border-left-color: var(--neon-purple);">
+                <div class="formula-body">
+                    $$i_n = \frac{R_{eq}}{R_n} \cdot i_s \quad \text{onde} \quad \frac{1}{R_{eq}} = \sum_{k=1}^n \frac{1}{R_k}$$
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: CURTO-CIRCUITO EM PARALELO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-triangle-exclamation"></i> Fenômeno Fundamental</div>
+            <h2>3. Curto-Circuito em Paralelo ($R_x \parallel 0 = 0\,\Omega$)</h2>
+            <p>
+                Um dos teoremas mais enfatizados pelo Prof. Amorim: <em>"Uma resistência associada com um curto-circuito sempre resulta em um curto-circuito."</em>
+            </p>
+
+            <div class="formula-card" style="border-left-color: var(--neon-rose);">
+                <div class="formula-body">
+                    $$R_{eq} = \frac{R_x \cdot 0}{R_x + 0} = 0\,\Omega \implies v_{ab} = 0\,\text{V} \implies i_s = \frac{v_s}{R_s}$$
+                </div>
+                <div class="formula-desc">
+                    Toda a corrente do circuito desvia pelo fio ideal de resistência nula. Os resistores em paralelo com o curto deixam de conduzir corrente e são anulados na análise!
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: EFEITO DE CARGA (LOAD EFFECT) -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-plug-circle-check"></i> Engenharia Prática</div>
+            <h2>4. Efeito de Carga ($R_L$) no Divisor de Tensão</h2>
+            <p>
+                Exercício da Aula 5: <em>"A tensão $v_o$ de um divisor alimentado por 20V com $R_1 = 40\,\Omega$ é igual a 4V em circuito aberto. Ao conectar um resistor de carga $R_L$, a tensão cai para 3V. Calcule $R_2$ e $R_L$."</em>
+            </p>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">Resolução Algébrica UNIFESP</span>
+                </div>
+                <div class="formula-body" style="font-size: 1rem; text-align: left;">
+                    1. Sem a carga ($R_L$ desconectado):<br>
+                    $$4 = \frac{R_2}{40 + R_2} \cdot 20 \implies 4(40 + R_2) = 20R_2 \implies 160 = 16R_2 \implies \mathbf{R_2 = 10\,\Omega}$$<br>
+                    2. Com a carga $R_L$ conectada em paralelo com $R_2$ ($R_x = R_2 \parallel R_L$):<br>
+                    $$3 = \frac{R_x}{40 + R_x} \cdot 20 \implies 3(40 + R_x) = 20R_x \implies 120 = 17R_x \implies R_x = \frac{120}{17}\,\Omega$$<br>
+                    3. Calculando $R_L$:<br>
+                    $$\frac{120}{17} = \frac{10 \cdot R_L}{10 + R_L} \implies 120(10 + R_L) = 170 R_L \implies 1200 = 50 R_L \implies \mathbf{R_L = 24\,\Omega}$$
+                </div>
+            </div>
+
+            <!-- Quiz Interativo -->
+            <div class="quiz-card">
+                <div class="quiz-title">
+                    <i class="fa-solid fa-circle-question"></i> Quiz: Divisor de Corrente Rápido
+                </div>
+                <div class="quiz-question">
+                    Uma fonte de corrente de $12\,\text{mA}$ alimenta dois resistores em paralelo de $3\,\text{k}\Omega$ e $6\,\text{k}\Omega$. Qual a corrente que flui pelo resistor de $3\,\text{k}\Omega$?
+                </div>
+                <div class="quiz-options">
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, false, 'Incorreto. A corrente maior passa pelo menor resistor.')">
+                        A) $4\,\text{mA}$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, true, 'Perfeito! $i_1 = \\frac{6k}{3k + 6k} \\cdot 12\\text{mA} = \\frac{6}{9} \\cdot 12 = 8\\,\\text{mA}$.')">
+                        B) $8\,\text{mA}$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, false, 'Incorreto. Aplique a regra com o resistor oposto no numerador.')">
+                        C) $6\,\text{mA}$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                </div>
+                <div id="quizExp" class="quiz-explanation"></div>
+            </div>
+        </section>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="0003-leis-de-kirchhoff.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Aula Anterior
+            </a>
+            <a href="0005-laboratorio-virtual.html" class="nav-next-btn">
+                Próximo Módulo: Laboratório Virtual de Bancada <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Script Simulador Divisor -->
+    <script>
+        const cvsV = document.getElementById('canvasVDiv');
+        const ctxV = cvsV.getContext('2d');
+
+        function updateVDivSim() {
+            const vs = parseFloat(document.getElementById('vdivVs').value);
+            const r1 = parseFloat(document.getElementById('vdivR1').value);
+            const r2 = parseFloat(document.getElementById('vdivR2').value);
+
+            const vout = (r2 / (r1 + r2)) * vs;
+            const v1 = (r1 / (r1 + r2)) * vs;
+            const i = vs / (r1 + r2);
+
+            document.getElementById('vOutDisp').innerText = vout.toFixed(2) + ' V';
+
+            const w = cvsV.parentElement.clientWidth - 48;
+            const h = 240;
+            cvsV.width = w;
+            cvsV.height = h;
+
+            ctxV.clearRect(0, 0, w, h);
+
+            // Desenho do circuito Divisor de Tensão
+            ctxV.strokeStyle = 'rgba(56, 189, 248, 0.6)';
+            ctxV.lineWidth = 3;
+
+            // Malha
+            ctxV.beginPath();
+            ctxV.moveTo(100, 40);
+            ctxV.lineTo(w / 2, 40);
+            ctxV.lineTo(w / 2, 200);
+            ctxV.lineTo(100, 200);
+            ctxV.closePath();
+            ctxV.stroke();
+
+            // Terminal de Saída
+            ctxV.beginPath();
+            ctxV.moveTo(w / 2, 120);
+            ctxV.lineTo(w - 100, 120);
+            ctxV.stroke();
+
+            // Labels
+            ctxV.fillStyle = '#fff';
+            ctxV.font = 'bold 13px JetBrains Mono';
+            ctxV.fillText(`Vs = ${vs}V`, 50, 125);
+            ctxV.fillText(`R1 = ${r1}kΩ  (VR1 = ${v1.toFixed(1)}V)`, w / 2 - 80, 80);
+            ctxV.fillText(`R2 = ${r2}kΩ  (Vout = ${vout.toFixed(1)}V)`, w / 2 - 80, 165);
+
+            // Voltímetro de Saída
+            ctxV.fillStyle = '#10b981';
+            ctxV.beginPath();
+            ctxV.arc(w - 100, 120, 25, 0, Math.PI * 2);
+            ctxV.fillStyle = 'rgba(16, 185, 129, 0.2)';
+            ctxV.fill();
+            ctxV.strokeStyle = '#10b981';
+            ctxV.stroke();
+
+            ctxV.fillStyle = '#10b981';
+            ctxV.font = 'bold 14px Outfit';
+            ctxV.fillText("Vout", w - 115, 115);
+            ctxV.font = 'bold 12px JetBrains Mono';
+            ctxV.fillText(`${vout.toFixed(1)}V`, w - 118, 132);
+        }
+
+        window.addEventListener('resize', updateVDivSim);
+        setTimeout(updateVDivSim, 50);
+
+        // Quiz Logic
+        function checkQuiz(btn, isCorrect, explanation) {
+            const parent = btn.parentElement;
+            const buttons = parent.querySelectorAll('.quiz-option-btn');
+            buttons.forEach(b => b.disabled = true);
+            
+            if (isCorrect) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('wrong');
+            }
+            
+            const exp = document.getElementById('quizExp');
+            exp.style.display = 'block';
+            exp.innerHTML = `<p style="color: ${isCorrect ? 'var(--neon-emerald)' : 'var(--neon-rose)'}; font-weight: 600;">${isCorrect ? '✅ Resposta Correta!' : '❌ Incorreto.'}</p><p>${explanation}</p>`;
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+    </script>
+</body>
+</html>

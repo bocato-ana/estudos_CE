@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 01: Conceitos Fundamentais I - Carga, Tensão, Corrente, Potência & Energia</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        /* 4 Quadrants Interactive Card */
+        .quadrant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .quadrant-card {
+            background: var(--card-inner);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .quadrant-card:hover, .quadrant-card.active {
+            border-color: var(--electric-cyan);
+            background: rgba(0, 242, 254, 0.08);
+            transform: translateY(-3px);
+        }
+
+        .quadrant-card.active {
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+
+        .quadrant-card .case-tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-bottom: 0.4rem;
+        }
+
+        .quadrant-card .calc {
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: #fff;
+            margin: 0.5rem 0;
+        }
+
+        .quadrant-card .result-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .label-absorbing {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--neon-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .label-generating {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--neon-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="nav-bar">
+                <a href="../index.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub Principal
+                </a>
+                <div class="lesson-badge-header">
+                    <i class="fa-solid fa-bolt"></i> Aula 2 • Prof. Henrique Amorim
+                </div>
+            </div>
+            <h1>Conceitos Fundamentais I</h1>
+            <p class="subtitle">Carga Elétrica, Corrente, Tensão, Convenção Passiva, Potência e Energia</p>
+        </header>
+
+        <!-- SEÇÃO 1: TEORIA DE CIRCUITOS -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-lightbulb"></i> Fundamentos da Teoria</div>
+            <h2>1. O que é a Teoria de Circuitos?</h2>
+            <p>
+                A teoria de circuitos é uma modelagem matemática refinada que nos permite estudar e prever o comportamento de sistemas elétricos complexos sem precisar resolver diretamente as intrincadas equações de campo eletromagnético de Maxwell em cada ponto do espaço.
+            </p>
+
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-brain" style="color: var(--electric-cyan);"></i> Abstração e Modelagem</h4>
+                    <p>
+                        Componentes físicos reais (fios, baterias, lâmpadas, motores) são representados por <strong>modelos matemáticos simplificados e ideais</strong> (bipolos com parâmetros concentrados).
+                    </p>
+                </div>
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-bullseye" style="color: var(--neon-emerald);"></i> Objetivo Prático</h4>
+                    <p>
+                        Fornecer a base matemática para interpretar e analisar diagramas elétricos, calcular tensões, correntes, fluxos de potência e garantir o correto dimensionamento dos sistemas.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: CARGA E CORRENTE -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-atom"></i> Portadores de Carga</div>
+            <h2>2. Carga Elétrica e Corrente ($i = dq/dt$)</h2>
+            <p>
+                A <strong>carga elétrica</strong> ($q$) é a propriedade física fundamental da matéria que determina as interações eletromagnéticas.
+            </p>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">Carga Elementar (Menor carga isolável)</span>
+                    <span class="formula-title">Unidade: Coulomb (C)</span>
+                </div>
+                <div class="formula-body">
+                    $$e = 1{,}6 \times 10^{-19}\text{ C}$$
+                </div>
+                <div class="formula-desc">
+                    Elétrons possuem carga negativa ($-e$), prótons carga positiva ($+e$) e nêutrons não possuem carga. Logo, $1\text{ C} \approx 6{,}24 \times 10^{18}\text{ elétrons}$.
+                </div>
+            </div>
+
+            <p>
+                A <strong>corrente elétrica</strong> ($i$) é a taxa temporal com que a carga elétrica atravessa uma seção transversal do condutor:
+            </p>
+
+            <div class="formula-card" style="border-left-color: var(--neon-emerald);">
+                <div class="formula-header">
+                    <span class="formula-title">Definição Matemática da Corrente</span>
+                    <span class="formula-title">Unidade: Ampère (A) = C/s</span>
+                </div>
+                <div class="formula-body">
+                    $$i(t) = \lim_{\Delta t \to 0} \frac{\Delta q}{\Delta t} = \frac{dq}{dt}$$
+                </div>
+                <div class="formula-desc">
+                    $1\text{ Ampère} = 6{,}24 \times 10^{18}\text{ elétrons passando por segundo}$. Como analogia didática do Prof. Amorim: <em>"1A carrega tantos elétrons por segundo quanto o Rio Amazonas leva de gotas de água para o mar ao longo de 17 dias inteiros!"</em>
+                </div>
+            </div>
+
+            <!-- SIMULADOR 1: FLUXO DE ELÉTRONS -->
+            <div class="sim-container">
+                <div class="sim-header">
+                    <div class="sim-title">
+                        <i class="fa-solid fa-play"></i> Simulador Interativo de Portadores de Carga
+                    </div>
+                    <div class="sim-stats">
+                        <div class="stat-pill">Estado: <span id="simState">Chave Fechada</span></div>
+                        <div class="stat-pill">Corrente: <span id="simCurrentVal">2.0 A</span></div>
+                    </div>
+                </div>
+                <canvas id="canvasElectrons" class="sim-canvas"></canvas>
+                <div class="sim-controls">
+                    <button class="btn-toggle active" id="btnSwitch" onclick="toggleSwitch()">
+                        <i class="fa-solid fa-toggle-on"></i> <span id="switchText">Chave: Fechada (Fluxo Ordenado)</span>
+                    </button>
+                    <div class="control-group">
+                        <label>Intensidade da Corrente (A)</label>
+                        <input type="range" class="custom-slider" id="sliderCurrent" min="0.5" max="5" step="0.5" value="2" oninput="changeCurrent(this.value)">
+                    </div>
+                    <button class="btn-toggle" id="btnDirection" onclick="toggleDirection()">
+                        <i class="fa-solid fa-right-left"></i> <span id="dirText">Sentido: Convencional (Direita)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-microscope" style="color: var(--neon-amber);"></i> Sentido Real das Cargas</h4>
+                    <p>Fisicamente, os elétrons livres (cargas negativas) são repelidos pelo polo negativo e atraídos pelo polo positivo (fluxo de $-$ para $+$).</p>
+                </div>
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-compass" style="color: var(--electric-cyan);"></i> Sentido Convencional</h4>
+                    <p>Adotado universalmente em engenharia e em todos os nossos cálculos: consideramos o fluxo como partindo do <strong>polo positivo para o negativo</strong> ($+$ para $-$).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: TENSÃO E MEDIÇÃO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-gauge"></i> Potencial Elétrico</div>
+            <h2>3. Tensão Elétrica ou DDP ($v = dw/dq$)</h2>
+            <p>
+                A <strong>Tensão Elétrica</strong> (ou Diferença de Potencial - DDP) é a medida da energia necessária para mover uma carga unitária entre dois pontos distintos do circuito.
+            </p>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">Definição Matemática da Tensão</span>
+                    <span class="formula-title">Unidade: Volts (V) = Joule / Coulomb (J/C)</span>
+                </div>
+                <div class="formula-body">
+                    $$v(t) = \frac{dw}{dq}$$
+                </div>
+                <div class="formula-desc">
+                    Fisicamente, a tensão indica a <strong>densidade energética</strong> do fluxo: quanta energia cada Coulomb de carga é capaz de transferir ao sistema.
+                </div>
+            </div>
+
+            <div class="alert-box alert-warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <strong>Rigor Técnico UNIFESP:</strong> Evite o termo coloquial <em>"voltagem"</em> (anglicismo informal de <em>voltage</em>). Em termos formais de engenharia, utilize sempre <strong>Tensão Elétrica</strong> ou <strong>Diferença de Potencial (DDP)</strong>.
+                </div>
+            </div>
+
+            <h3>Como medir Tensão e Corrente no Circuito?</h3>
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-arrows-split-up-and-left" style="color: var(--electric-cyan);"></i> Voltímetro: Medição em PARALELO</h4>
+                    <p>
+                        O voltímetro possui <strong>resistência interna ideal infinita ($R_v \to \infty$)</strong> e deve ser conectado entre dois nós distintos sem abrir o circuito.
+                    </p>
+                </div>
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-link" style="color: var(--neon-rose);"></i> Amperímetro: Medição em SÉRIE</h4>
+                    <p>
+                        O amperímetro possui <strong>resistência interna ideal nula ($R_a \to 0$)</strong>. O circuito precisa ser <em>seccionado (aberto)</em> para o instrumento ser inserido no caminho da corrente.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: CONVENÇÃO PASSIVA E POTÊNCIA -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-scale-balanced"></i> Contrato Algébrico</div>
+            <h2>4. Convenção Passiva e Potência ($p = v \cdot i$)</h2>
+            <p>
+                A convenção passiva é a regra fundamental de teoria de circuitos que estabelece a consistência matemática dos sinais de potência.
+            </p>
+
+            <div class="formula-card" style="border-left-color: var(--neon-amber);">
+                <div class="formula-header">
+                    <span class="formula-title">Potência Elétrica Instantânea</span>
+                    <span class="formula-title">Unidade: Watt (W) = J/s</span>
+                </div>
+                <div class="formula-body">
+                    $$p(t) = \frac{dw}{dt} = \left(\frac{dw}{dq}\right) \cdot \left(\frac{dq}{dt}\right) = v(t) \cdot i(t)$$
+                </div>
+                <div class="formula-desc">
+                    A potência expressa a taxa temporal (velocidade) com que a energia é fornecida ou absorvida por um bipolo.
+                </div>
+            </div>
+
+            <h3>Regras da Convenção Passiva:</h3>
+            <ul style="color: var(--text-secondary); margin-left: 1.5rem; margin-bottom: 1.25rem;">
+                <li style="margin-bottom: 0.5rem;"><strong style="color: var(--neon-emerald);">Queda de Tensão (Sinal $+$):</strong> Adota-se $+v \cdot i$ quando a corrente <em>entra pelo terminal positivo ($+$)</em> do bipolo.</li>
+                <li><strong style="color: var(--neon-amber);">Elevação de Tensão (Sinal $-$):</strong> Adota-se $-v \cdot i$ quando a corrente <em>entra pelo terminal negativo ($-$)</em> do bipolo.</li>
+            </ul>
+
+            <!-- SIMULADOR 2: QUADRANTES DA POTÊNCIA -->
+            <div class="sim-container">
+                <div class="sim-header">
+                    <div class="sim-title">
+                        <i class="fa-solid fa-sliders"></i> Teste Interativo: Os 4 Casos de Referência de Potência
+                    </div>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                    Clique em um dos 4 casos abaixo para analisar o sinal algébrico e o estado operacional do bipolo:
+                </p>
+                <div class="quadrant-grid">
+                    <div class="quadrant-card active" onclick="selectQuadrant(0)">
+                        <div class="case-tag">Caso 1: $v = +10V$, $i = +3A$ entrando no $(+)$</div>
+                        <div class="calc">$$p = +(10) \cdot (3) = +30\text{W}$$</div>
+                        <span class="result-label label-absorbing">Absorvendo Potência</span>
+                    </div>
+                    <div class="quadrant-card" onclick="selectQuadrant(1)">
+                        <div class="case-tag">Caso 2: $v = +10V$, $i = -3A$ saindo do $(+)$</div>
+                        <div class="calc">$$p = -(10) \cdot (-3) = +30\text{W}$$</div>
+                        <span class="result-label label-absorbing">Absorvendo Potência</span>
+                    </div>
+                    <div class="quadrant-card" onclick="selectQuadrant(2)">
+                        <div class="case-tag">Caso 3: $v = -10V$, $i = +3A$ entrando no $(-)$</div>
+                        <div class="calc">$$p = -(3) \cdot (-10) = +30\text{W}$$</div>
+                        <span class="result-label label-absorbing">Absorvendo Potência</span>
+                    </div>
+                    <div class="quadrant-card" onclick="selectQuadrant(3)">
+                        <div class="case-tag">Caso 4: $v = -10V$, $i = -3A$ saindo do $(-)$</div>
+                        <div class="calc">$$p = +(-3) \cdot (-10) = +30\text{W}$$</div>
+                        <span class="result-label label-absorbing">Absorvendo Potência</span>
+                    </div>
+                </div>
+
+                <div id="quadrantExplanation" class="card-panel" style="margin-top: 1rem; border-left: 3px solid var(--electric-cyan);">
+                    <strong>Diagnóstico Operacional:</strong> Sinal Positivo ($+P$). O componente está <strong>absorvendo / dissipando energia</strong> (comportamento típico de resistores, motores consumindo ou baterias em processo de recarga).
+                </div>
+            </div>
+
+            <div class="formula-card" style="border-left-color: var(--neon-purple);">
+                <div class="formula-header">
+                    <span class="formula-title">Teorema da Conservação de Energia (Tellegen)</span>
+                </div>
+                <div class="formula-body">
+                    $$\sum_{k} P_k = 0 \iff P_{\text{gerada}} = P_{\text{absorvida}}$$
+                </div>
+                <div class="formula-desc">
+                    A soma algébrica de todas as potências em um circuito fechado é rigorosamente igual a zero.
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 5: ENERGIA -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-battery-full"></i> Trabalho Acumulado</div>
+            <h2>5. Energia Elétrica ($w = \int p \, dt$)</h2>
+            <p>
+                Enquanto a potência representa a taxa instantânea de consumo (Watts = J/s), a <strong>Energia</strong> ($w$) é a capacidade total de realizar trabalho acumulada ao longo de um intervalo de tempo:
+            </p>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">Integral da Potência Instantânea</span>
+                    <span class="formula-title">Unidade SI: Joule (J) | Comercial: kWh</span>
+                </div>
+                <div class="formula-body">
+                    $$w = \int_{t_0}^{t_f} p(t)\,dt = \int_{t_0}^{t_f} v(t) \cdot i(t)\,dt$$
+                </div>
+                <div class="formula-desc">
+                    Fator de conversão comercial: $1\text{ kWh} = 1000\text{ W} \times 3600\text{ s} = 3{,}6 \times 10^6\text{ J}$.
+                </div>
+            </div>
+
+            <!-- Quiz Interativo -->
+            <div class="quiz-card">
+                <div class="quiz-title">
+                    <i class="fa-solid fa-circle-question"></i> Quiz de Fixação: Exercício da Aula 2 (UNIFESP)
+                </div>
+                <div class="quiz-question">
+                    Um bipolo é submetido a uma tensão constante $v = 5\text{V}$ e percorrido por uma corrente em rampa dada por $i(t) = 3t\text{ A}$. Qual a energia total absorvida no intervalo de $t = 0$ a $t = 3\text{ s}$?
+                </div>
+                <div class="quiz-options">
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, false, 'Atenção: como a corrente varia no tempo, você precisa integrar $3t \cdot 5 = 15t$.')">
+                        A) $45\text{ J}$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, true, 'Perfeito! $w = \\int_0^3 15t\\,dt = \\left[\\frac{15t^2}{2}\\right]_0^3 = \\frac{15 \\cdot 9}{2} = 67{,}5\\text{ J}$.')">
+                        B) $67{,}5\text{ J}$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, false, 'Incorreto. Não se esqueça de dividir por 2 na integração de $t$.')">
+                        C) $135\text{ J}$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                </div>
+                <div id="quizExp" class="quiz-explanation"></div>
+            </div>
+        </section>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="../index.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Índice de Aulas
+            </a>
+            <a href="0002-lei-de-ohm-fontes.html" class="nav-next-btn">
+                Próxima Aula: Fontes & Lei de Ohm <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Script dos Simuladores e Quizzes -->
+    <script>
+        // Simulador de Elétrons Canvas
+        const canvas = document.getElementById('canvasElectrons');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let isSwitchClosed = true;
+        let currentMagnitude = 2.0;
+        let direction = 1; // 1 = Convencional (Direita), -1 = Real (Esquerda)
+        let particles = [];
+
+        function resizeCanvas() {
+            width = canvas.parentElement.clientWidth - 48;
+            height = 220;
+            canvas.width = width;
+            canvas.height = height;
+            initParticles();
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.min(80, Math.floor(width / 12));
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: 70 + Math.random() * 80,
+                    vx: (Math.random() - 0.5) * 1.5,
+                    vy: (Math.random() - 0.5) * 1.5,
+                    radius: 4.5
+                });
+            }
+        }
+
+        function drawCircuit() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Condutor Tubular
+            ctx.fillStyle = 'rgba(30, 41, 59, 0.6)';
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.fillRect(40, 60, width - 80, 100);
+            ctx.strokeRect(40, 60, width - 80, 100);
+
+            // Rótulos
+            ctx.fillStyle = '#64748b';
+            ctx.font = '12px JetBrains Mono';
+            ctx.fillText("Fio Condutor de Cobre (Seção Transversal)", 50, 50);
+
+            // Polos
+            ctx.fillStyle = '#f43f5e';
+            ctx.font = 'bold 16px Outfit';
+            ctx.fillText("+ Polo Positivo", 45, 185);
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillText("- Polo Negativo", width - 170, 185);
+
+            // Partículas (Elétrons)
+            particles.forEach(p => {
+                if (isSwitchClosed) {
+                    // Movimento ordenado com drift
+                    const driftSpeed = currentMagnitude * 1.2 * direction;
+                    p.x += driftSpeed + (Math.random() - 0.5) * 0.8;
+                    p.y += (Math.random() - 0.5) * 0.8;
+                } else {
+                    // Movimento térmico aleatório desordenado
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (Math.random() < 0.05) {
+                        p.vx = (Math.random() - 0.5) * 2;
+                        p.vy = (Math.random() - 0.5) * 2;
+                    }
+                }
+
+                // Colisões com as paredes do condutor
+                if (p.x < 45) p.x = width - 45;
+                if (p.x > width - 45) p.x = 45;
+                if (p.y < 65) p.y = 65;
+                if (p.y > 155) p.y = 155;
+
+                // Desenhar elétron
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#00f2fe';
+                ctx.shadowColor = '#00f2fe';
+                ctx.shadowBlur = isSwitchClosed ? 8 : 2;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
+
+            // Seta de Sentido Geral
+            if (isSwitchClosed) {
+                ctx.fillStyle = direction === 1 ? '#10b981' : '#f59e0b';
+                ctx.font = 'bold 14px JetBrains Mono';
+                const label = direction === 1 ? " fluxo convencional (i) -->" : "<-- fluxo real de elétrons";
+                ctx.fillText(label, width / 2 - 100, 115);
+            }
+
+            requestAnimationFrame(drawCircuit);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        requestAnimationFrame(drawCircuit);
+
+        function toggleSwitch() {
+            isSwitchClosed = !isSwitchClosed;
+            const btn = document.getElementById('btnSwitch');
+            const state = document.getElementById('simState');
+            const txt = document.getElementById('switchText');
+            if (isSwitchClosed) {
+                btn.classList.add('active');
+                state.innerText = 'Chave Fechada (Condução)';
+                txt.innerText = 'Chave: Fechada (Fluxo Ordenado)';
+            } else {
+                btn.classList.remove('active');
+                state.innerText = 'Chave Aberta (Circuito Interrompido)';
+                txt.innerText = 'Chave: Aberta (Movimento Caótico)';
+            }
+        }
+
+        function changeCurrent(val) {
+            currentMagnitude = parseFloat(val);
+            document.getElementById('simCurrentVal').innerText = currentMagnitude.toFixed(1) + ' A';
+        }
+
+        function toggleDirection() {
+            direction = -direction;
+            const txt = document.getElementById('dirText');
+            if (direction === 1) {
+                txt.innerText = 'Sentido: Convencional (Direita)';
+            } else {
+                txt.innerText = 'Sentido: Real dos Elétrons (Esquerda)';
+            }
+        }
+
+        // Quadrant Selector
+        function selectQuadrant(idx) {
+            const cards = document.querySelectorAll('.quadrant-card');
+            cards.forEach((c, i) => c.classList.toggle('active', i === idx));
+            const exp = document.getElementById('quadrantExplanation');
+            
+            const msgs = [
+                "<strong>Caso 1 (+10V, +3A entrando no +):</strong> Queda de tensão com corrente positiva. $P = +30\\text{W}$. O bipolo está <strong>absorvendo/dissipando potência</strong> (ex: lâmpada ou resistor).",
+                "<strong>Caso 2 (+10V, -3A saindo do +):</strong> O cálculo resulta em $P = - (10) \\cdot (-3) = +30\\text{W}$. O bipolo continua <strong>absorvendo potência</strong>.",
+                "<strong>Caso 3 (-10V, +3A entrando no -):</strong> Pela convenção passiva, corrente entrando no polo negativo é elevação (sinal menos). $P = - (3) \\cdot (-10) = +30\\text{W}$. Absorvendo potência!",
+                "<strong>Caso 4 (-10V, -3A saindo do -):</strong> $P = +(-3) \\cdot (-10) = +30\\text{W}$. Consistência matemática perfeita em todos os referenciais!"
+            ];
+            exp.innerHTML = msgs[idx];
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        // Quiz Logic
+        function checkQuiz(btn, isCorrect, explanation) {
+            const parent = btn.parentElement;
+            const buttons = parent.querySelectorAll('.quiz-option-btn');
+            buttons.forEach(b => b.disabled = true);
+            
+            if (isCorrect) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('wrong');
+            }
+            
+            const exp = document.getElementById('quizExp');
+            exp.style.display = 'block';
+            exp.innerHTML = `<p style="color: ${isCorrect ? 'var(--neon-emerald)' : 'var(--neon-rose)'}; font-weight: 600;">${isCorrect ? '✅ Resposta Correta!' : '❌ Incorreto.'}</p><p>${explanation}</p>`;
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+    </script>
+</body>
+</html>

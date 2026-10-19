@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório Virtual de Bancada - Circuitos Elétricos I</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .workbench-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (min-width: 900px) {
+            .workbench-grid {
+                grid-template-columns: 1.6fr 1fr;
+            }
+        }
+
+        .bench-card {
+            background: var(--container-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bench-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .bench-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--neon-indigo);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Mode Selector Tabs */
+        .circuit-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.25rem;
+        }
+
+        .circuit-tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .circuit-tab-btn.active {
+            background: rgba(129, 140, 248, 0.2);
+            border-color: var(--neon-indigo);
+            color: #fff;
+        }
+
+        .bench-canvas {
+            width: 100%;
+            height: 300px;
+            background: #040711;
+            border-radius: 12px;
+            display: block;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* Digital Multimeter Instrument UI */
+        .dmm-device {
+            background: #1e1b2e;
+            border: 3px solid #312e81;
+            border-radius: 18px;
+            padding: 1.25rem;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .dmm-lcd {
+            background: #84cc16;
+            background: linear-gradient(180deg, #9ae6b4 0%, #68d391 100%);
+            border: 3px solid #276749;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            text-align: right;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .dmm-lcd .digits {
+            font-family: var(--font-mono);
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #1a365d;
+            letter-spacing: 0.05em;
+            line-height: 1;
+        }
+
+        .dmm-lcd .unit {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #2c5282;
+            text-transform: uppercase;
+        }
+
+        .dmm-dial {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+
+        .dial-btn {
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            color: #e2e8f0;
+            padding: 0.6rem 0.3rem;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .dial-btn.active {
+            background: var(--neon-indigo);
+            color: #080c14;
+            border-color: #c7d2fe;
+            box-shadow: 0 0 10px rgba(129, 140, 248, 0.4);
+        }
+
+        .probes-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .probe-select-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .probe-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+        }
+
+        .probe-select {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        /* Controls Panel */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .control-group label {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .custom-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.15);
+            outline: none;
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--neon-indigo);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--neon-indigo);
+        }
+
+        .btn-action-lab {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(129, 140, 248, 0.15);
+            border: 1px solid rgba(129, 140, 248, 0.3);
+            color: var(--neon-indigo);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .btn-action-lab:hover {
+            background: rgba(129, 140, 248, 0.3);
+            transform: scale(1.02);
+        }
+
+        .btn-action-lab.active {
+            background: var(--neon-indigo);
+            color: #080c14;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="nav-bar">
+                <a href="../index.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub Principal
+                </a>
+                <div class="lesson-badge-header">
+                    <i class="fa-solid fa-flask-vial"></i> Módulo 05 • Laboratório de Bancada
+                </div>
+            </div>
+            <h1>Bancada Virtual de Circuitos & Multímetro Digital</h1>
+            <p class="subtitle">Simulação Interativa com Pontas de Prova, Chaveamento de Carga e Medições em Tempo Real</p>
+        </header>
+
+        <!-- CIRCUIT WORKBENCH -->
+        <div class="workbench-grid">
+            
+            <!-- Circuit Board Area -->
+            <div class="bench-card">
+                <div class="bench-header">
+                    <div class="bench-title">
+                        <i class="fa-solid fa-microchip"></i> Protoboard & Esquema Esquemático
+                    </div>
+                </div>
+
+                <!-- Circuit Selector -->
+                <div class="circuit-tabs">
+                    <button class="circuit-tab-btn active" onclick="selectCircuit(1, this)">
+                        Circuito 1: Fonte CC + Reostato + Lâmpada
+                    </button>
+                    <button class="circuit-tab-btn" onclick="selectCircuit(2, this)">
+                        Circuito 2: Divisor com Carga Conectável
+                    </button>
+                    <button class="circuit-tab-btn" onclick="selectCircuit(3, this)">
+                        Circuito 3: Malha com Chave de Curto
+                    </button>
+                </div>
+
+                <canvas id="benchCanvas" class="bench-canvas"></canvas>
+
+                <!-- Interactive Controls -->
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label>Tensão Fonte $V_s$ (<span id="lblVs">12V</span>)</label>
+                        <input type="range" class="custom-slider" id="labVs" min="0" max="30" step="1" value="12" oninput="updateLab()">
+                    </div>
+                    <div class="control-group">
+                        <label>Resistência / Reostato (<span id="lblR">10Ω</span>)</label>
+                        <input type="range" class="custom-slider" id="labR" min="1" max="50" step="1" value="10" oninput="updateLab()">
+                    </div>
+                    <div class="control-group" style="justify-content: flex-end;">
+                        <button class="btn-action-lab active" id="btnLabSwitch" onclick="toggleLabSwitch()">
+                            <i class="fa-solid fa-power-off"></i> <span id="lblSwitch">Chave: LIGADA</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Digital Multimeter Side Device -->
+            <div class="bench-card" style="padding: 1.25rem;">
+                <div class="bench-header" style="margin-bottom: 0.75rem;">
+                    <div class="bench-title" style="font-size: 1rem;">
+                        <i class="fa-solid fa-gauge-high"></i> Multímetro Digital
+                    </div>
+                </div>
+
+                <div class="dmm-device">
+                    <div class="dmm-lcd">
+                        <div class="digits" id="dmmDigits">12.00</div>
+                        <div class="unit" id="dmmUnit">VOLTS CC</div>
+                    </div>
+
+                    <div class="dmm-dial">
+                        <button class="dial-btn active" onclick="setDmmMode('V', this)">DC V</button>
+                        <button class="dial-btn" onclick="setDmmMode('mA', this)">DC mA</button>
+                        <button class="dial-btn" onclick="setDmmMode('OHM', this)">OHM Ω</button>
+                    </div>
+
+                    <div class="probes-section">
+                        <div class="probe-select-row">
+                            <span class="probe-tag" style="color: var(--neon-rose);">
+                                <i class="fa-solid fa-circle"></i> Ponta Vermelha (+)
+                            </span>
+                            <select class="probe-select" id="probeRed" onchange="updateLab()">
+                                <option value="A">Nó A (+)</option>
+                                <option value="B" selected>Nó B (Carga)</option>
+                                <option value="C">Nó C (GND)</option>
+                            </select>
+                        </div>
+                        <div class="probe-select-row">
+                            <span class="probe-tag" style="color: #64748b;">
+                                <i class="fa-solid fa-circle"></i> Ponta Preta (-)
+                            </span>
+                            <select class="probe-select" id="probeBlack" onchange="updateLab()">
+                                <option value="A">Nó A (+)</option>
+                                <option value="B">Nó B (Carga)</option>
+                                <option value="C" selected>Nó C (GND)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Explicação Didática da Bancada -->
+        <div class="bench-card" style="margin-top: 1.5rem;">
+            <h3 style="color: var(--neon-indigo); margin-bottom: 0.5rem;">
+                <i class="fa-solid fa-graduation-cap"></i> Como interpretar as medições na bancada:
+            </h3>
+            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                1. <strong>Tensão entre Nós ($V_{AB} = V_A - V_B$):</strong> O voltímetro mede a diferença de potencial entre a ponta vermelha e a ponta preta. Se você inverter as pontas, o display indicará o mesmo valor com sinal negativo ($-$).<br>
+                2. <strong>Medição em Carga Aberta:</strong> Quando a chave estiver aberta, a corrente cai para $0\,\text{mA}$, mas a diferença de potencial através da chave aberta é a própria tensão da fonte!
+            </p>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="0004-divisores-tensao-corrente.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Aula Anterior
+            </a>
+            <a href="0006-exercicios-resolvidos.html" class="nav-next-btn">
+                Próximo: Central de Exercícios Resolvidos <i class="fa-solid fa-award"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Script da Bancada -->
+    <script>
+        const cvsB = document.getElementById('benchCanvas');
+        const ctxB = cvsB.getContext('2d');
+        
+        let currentCircuitType = 1;
+        let isSwitchOn = true;
+        let dmmMode = 'V'; // 'V', 'mA', 'OHM'
+
+        function selectCircuit(type, btn) {
+            currentCircuitType = type;
+            document.querySelectorAll('.circuit-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateLab();
+        }
+
+        function toggleLabSwitch() {
+            isSwitchOn = !isSwitchOn;
+            const btn = document.getElementById('btnLabSwitch');
+            const lbl = document.getElementById('lblSwitch');
+            if (isSwitchOn) {
+                btn.classList.add('active');
+                lbl.innerText = 'Chave: LIGADA';
+            } else {
+                btn.classList.remove('active');
+                lbl.innerText = 'Chave: ABERTA';
+            }
+            updateLab();
+        }
+
+        function setDmmMode(mode, btn) {
+            dmmMode = mode;
+            document.querySelectorAll('.dial-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateLab();
+        }
+
+        function updateLab() {
+            const vs = parseFloat(document.getElementById('labVs').value);
+            const r = parseFloat(document.getElementById('labR').value);
+            document.getElementById('lblVs').innerText = vs + 'V';
+            document.getElementById('lblR').innerText = r + 'Ω';
+
+            const pRed = document.getElementById('probeRed').value;
+            const pBlack = document.getElementById('probeBlack').value;
+
+            // Cálculos elétricos dos nós A, B, C
+            let vA = vs;
+            let vC = 0;
+            let vB = 0;
+            let iBranch = 0;
+
+            if (currentCircuitType === 1) {
+                // Fonte + Reostato (R) + Lâmpada (10Ω)
+                const rLamp = 10;
+                if (isSwitchOn) {
+                    iBranch = vs / (r + rLamp);
+                    vB = iBranch * rLamp;
+                } else {
+                    iBranch = 0;
+                    vB = 0;
+                }
+            } else if (currentCircuitType === 2) {
+                // Divisor de Tensão R1=20Ω, R2=R, Carga=15Ω
+                const r1 = 20;
+                const rLoad = 15;
+                if (isSwitchOn) {
+                    const rPar = (r * rLoad) / (r + rLoad);
+                    iBranch = vs / (r1 + rPar);
+                    vB = iBranch * rPar;
+                } else {
+                    iBranch = vs / (r1 + r);
+                    vB = iBranch * r;
+                }
+            } else if (currentCircuitType === 3) {
+                // Malha com chave de curto
+                if (isSwitchOn) {
+                    // Curto ligado em paralelo com R
+                    vB = 0;
+                    iBranch = vs / 5; // R_serie = 5
+                } else {
+                    vB = (r / (5 + r)) * vs;
+                    iBranch = vs / (5 + r);
+                }
+            }
+
+            // Atualização do DMM LCD
+            const nodePotentials = { 'A': vA, 'B': vB, 'C': vC };
+            let displayVal = "0.00";
+            let unitText = "VOLTS CC";
+
+            if (dmmMode === 'V') {
+                const diff = nodePotentials[pRed] - nodePotentials[pBlack];
+                displayVal = diff.toFixed(2);
+                unitText = "VOLTS CC";
+            } else if (dmmMode === 'mA') {
+                displayVal = (iBranch * 1000).toFixed(1);
+                unitText = "mILIAMPÈRES CC";
+            } else if (dmmMode === 'OHM') {
+                displayVal = isSwitchOn ? r.toFixed(1) : "O.L (Infinito)";
+                unitText = "OHMS Ω";
+            }
+
+            document.getElementById('dmmDigits').innerText = displayVal;
+            document.getElementById('dmmUnit').innerText = unitText;
+
+            // Render Canvas
+            const w = cvsB.parentElement.clientWidth - 48;
+            const h = 300;
+            cvsB.width = w;
+            cvsB.height = h;
+
+            ctxB.clearRect(0, 0, w, h);
+
+            // Desenho do Circuito
+            ctxB.strokeStyle = '#38bdf8';
+            ctxB.lineWidth = 3;
+
+            // Trilha principal
+            ctxB.beginPath();
+            ctxB.moveTo(80, 70);
+            ctxB.lineTo(w / 2, 70);
+            ctxB.lineTo(w - 80, 70);
+            ctxB.lineTo(w - 80, 230);
+            ctxB.lineTo(80, 230);
+            ctxB.closePath();
+            ctxB.stroke();
+
+            // Nós A, B, C com marcas
+            const nodes = [
+                { id: 'A', x: 80, y: 70, col: '#f43f5e' },
+                { id: 'B', x: w / 2, y: 70, col: '#00f2fe' },
+                { id: 'C', x: w / 2, y: 230, col: '#64748b' }
+            ];
+
+            nodes.forEach(n => {
+                ctxB.beginPath();
+                ctxB.arc(n.x, n.y, 8, 0, Math.PI * 2);
+                ctxB.fillStyle = n.col;
+                ctxB.fill();
+                ctxB.strokeStyle = '#fff';
+                ctxB.lineWidth = 2;
+                ctxB.stroke();
+
+                ctxB.fillStyle = '#fff';
+                ctxB.font = 'bold 12px JetBrains Mono';
+                ctxB.fillText(`Nó ${n.id} (${(nodePotentials[n.id] || 0).toFixed(1)}V)`, n.x - 25, n.y - 15);
+            });
+
+            // Lâmpada animada no ramo direito
+            const lampX = w - 80;
+            const lampY = 150;
+            ctxB.beginPath();
+            ctxB.arc(lampX, lampY, 20, 0, Math.PI * 2);
+            if (isSwitchOn && iBranch > 0.05) {
+                const glow = Math.min(1, iBranch * 1.5);
+                ctxB.fillStyle = `rgba(251, 191, 36, ${glow})`;
+                ctxB.shadowColor = '#fbbf24';
+                ctxB.shadowBlur = 25 * glow;
+                ctxB.fill();
+                ctxB.shadowBlur = 0;
+            } else {
+                ctxB.fillStyle = '#1e293b';
+                ctxB.fill();
+            }
+            ctxB.strokeStyle = '#fff';
+            ctxB.stroke();
+
+            ctxB.fillStyle = '#fff';
+            ctxB.font = 'bold 12px JetBrains Mono';
+            ctxB.fillText(`Lâmpada / Carga`, lampX - 45, lampY + 35);
+            ctxB.fillText(`Fonte: ${vs}V`, 40, 155);
+            ctxB.fillText(`Reostato: ${r}Ω`, w / 2 - 40, 95);
+        }
+
+        window.addEventListener('resize', updateLab);
+        setTimeout(updateLab, 50);
+    </script>
+</body>
+</html>

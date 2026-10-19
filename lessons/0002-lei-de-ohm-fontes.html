@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 02: Fontes Ideais, Dependentes & Lei de Ohm</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        /* LED Real Demo Interactive */
+        .led-demo-box {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-around;
+            background: var(--card-inner);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            gap: 1.5rem;
+        }
+
+        .led-visual {
+            text-align: center;
+        }
+
+        .led-bulb {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #222;
+            margin: 0 auto 0.75rem auto;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .led-bulb.lit {
+            background: #00f2fe;
+            box-shadow: 0 0 35px #00f2fe, 0 0 70px #00f2fe;
+            border-color: #fff;
+        }
+
+        .led-bulb.burned {
+            background: #ef4444;
+            box-shadow: 0 0 25px #ef4444;
+        }
+
+        .led-status-tag {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="nav-bar">
+                <a href="../index.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub Principal
+                </a>
+                <div class="lesson-badge-header">
+                    <i class="fa-solid fa-car-battery"></i> Aula 3 • Prof. Henrique Amorim
+                </div>
+            </div>
+            <h1>Fontes Ideais, Dependentes & Lei de Ohm</h1>
+            <p class="subtitle">Modelagem de Fontes, 1ª e 2ª Leis de Ohm, Curvas I-V e Dimensionamento de Cargas</p>
+        </header>
+
+        <!-- SEÇÃO 1: FONTES INDEPENDENTES -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-plug"></i> Geradores Ideais</div>
+            <h2>1. Modelos de Fontes Independentes</h2>
+            <p>
+                As fontes são representações matemáticas de dispositivos conversores de energia (como pilhas, células fotovoltaicas, geradores ou redes elétricas).
+            </p>
+
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-circle-dot" style="color: var(--neon-amber);"></i> Fonte de Tensão Independente</h4>
+                    <p>
+                        Mantém a <strong>tensão prescrita $v_s$ fixa</strong> entre seus terminais, independentemente do valor da corrente que flui por ela.
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-dim);">
+                        Exemplos: $v_s = 10\text{V}$ (CC), $v_s = V_m \cos(\omega t + \phi)$ (CA), $v_s = 10t$ (Rampa).
+                    </p>
+                </div>
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-arrow-up-long" style="color: var(--electric-cyan);"></i> Fonte de Corrente Independente</h4>
+                    <p>
+                        Mantém a <strong>corrente prescrita $i_s$ fixa</strong> fluindo pelo ramo, independentemente da tensão resultante entre seus terminais.
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-dim);">
+                        Exemplos: $i_s = 4\text{A}$ (CC), $i_s = I_m \cos(\omega t + \phi)$ (CA), $i_s = 6t$ (Rampa).
+                    </p>
+                </div>
+            </div>
+
+            <h3>Interconexões Permissíveis vs Não-Permissíveis</h3>
+            <p>
+                Fontes ideais possuem restrições matemáticas rigorosas quanto à conexão mútua:
+            </p>
+            <div class="grid-2col">
+                <div class="card-panel" style="border-left: 3px solid var(--neon-rose);">
+                    <h4 style="color: var(--neon-rose);"><i class="fa-solid fa-ban"></i> Não Permissível (Violação de Leis)</h4>
+                    <ul style="font-size: 0.9rem; color: var(--text-secondary); margin-left: 1.2rem;">
+                        <li>Fontes de <strong>tensão de valores diferentes em paralelo</strong> (ex: $10\text{V} \parallel 5\text{V}$). Viola a unicidade do potencial no nó.</li>
+                        <li>Fontes de <strong>corrente de valores diferentes no mesmo ramo em série</strong> (ex: $3\text{A}$ em série com $5\text{A}$ em sentido oposto). Viola a conservação de carga.</li>
+                    </ul>
+                </div>
+                <div class="card-panel" style="border-left: 3px solid var(--neon-emerald);">
+                    <h4 style="color: var(--neon-emerald);"><i class="fa-solid fa-check"></i> Permissível (Conexão Válida)</h4>
+                    <ul style="font-size: 0.9rem; color: var(--text-secondary); margin-left: 1.2rem;">
+                        <li>Fontes de tensão de mesmo valor em paralelo ($10\text{V} \parallel 10\text{V}$).</li>
+                        <li>Fonte de corrente em paralelo com fonte de tensão (o nó impõe a tensão e o ramo impõe a corrente).</li>
+                        <li>Fontes de tensão de qualquer valor associadas em série (as tensões se somam).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: LEI DE OHM E RESISTÊNCIA -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-microchip"></i> Bipolos Passivos</div>
+            <h2>2. 1ª e 2ª Leis de Ohm</h2>
+            <p>
+                Simon Ohm descobriu experimentalmente que em materiais condutores, o fluxo de cargas cresce proporcionalmente à tensão aplicada.
+            </p>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">1ª Lei de Ohm</span>
+                    <span class="formula-title">Unidade: Ohm ($\Omega$) = V/A</span>
+                </div>
+                <div class="formula-body">
+                    $$v = R \cdot i \iff R = \frac{v}{i} \iff i = \frac{v}{R}$$
+                </div>
+            </div>
+
+            <p>
+                A <strong>2ª Lei de Ohm</strong> descreve a resistência física a partir da geometria e das propriedades microscópicas do material:
+            </p>
+
+            <div class="formula-card" style="border-left-color: var(--electric-cyan);">
+                <div class="formula-header">
+                    <span class="formula-title">2ª Lei de Ohm (Resistência em um Condutor)</span>
+                </div>
+                <div class="formula-body">
+                    $$R = \rho \cdot \frac{l}{A}$$
+                </div>
+                <div class="formula-desc">
+                    Onde $\rho$ é a resistividade do material ($\Omega\cdot\text{m}$), $l$ é o comprimento do condutor (m) e $A$ é a área da seção transversal ($\text{m}^2$). É esse princípio que permite o funcionamento de <strong>potenciômetros e reostatos</strong>!
+                </div>
+            </div>
+
+            <!-- SIMULADOR 1: 2ª LEI DE OHM -->
+            <div class="sim-container">
+                <div class="sim-header">
+                    <div class="sim-title">
+                        <i class="fa-solid fa-ruler-combined"></i> Simulador Interativo da 2ª Lei de Ohm ($R = \rho \cdot l / A$)
+                    </div>
+                    <div class="stat-pill">Resistência $R$: <span id="resCalcVal">10.00 Ω</span></div>
+                </div>
+                <canvas id="canvasResistor" class="sim-canvas"></canvas>
+                <div class="sim-controls">
+                    <div class="control-group">
+                        <label>Comprimento (l)</label>
+                        <input type="range" class="custom-slider" id="sliderL" min="1" max="10" step="0.5" value="5" oninput="updateResistorSim()">
+                    </div>
+                    <div class="control-group">
+                        <label>Área de Seção (A)</label>
+                        <input type="range" class="custom-slider" id="sliderA" min="1" max="10" step="0.5" value="5" oninput="updateResistorSim()">
+                    </div>
+                    <div class="control-group">
+                        <label>Material / Resistividade (ρ)</label>
+                        <select id="selMaterial" onchange="updateResistorSim()" style="background: rgba(10,15,26,0.9); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 0.35rem; border-radius: 6px; font-family: var(--font-mono);">
+                            <option value="1">Cobre (Baixa ρ)</option>
+                            <option value="2">Alumínio (Média ρ)</option>
+                            <option value="5">Níquel-Cromo (Alta ρ)</option>
+                            <option value="10">Grafite (Muito Alta ρ)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Potência Dissipada no Resistor</h3>
+            <p>
+                Como o resistor é um bipolo puramente consumidor, a potência é sempre positiva:
+            </p>
+            <div class="formula-card" style="border-left-color: var(--neon-emerald);">
+                <div class="formula-body">
+                    $$p = v \cdot i = (R \cdot i) \cdot i = i^2 \cdot R = \frac{v^2}{R}$$
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: CURTO-CIRCUITO E CIRCUITO ABERTO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-bolt"></i> Casos Limite</div>
+            <h2>3. Curto-Circuito vs Circuito Aberto</h2>
+            
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4 style="color: var(--neon-rose);"><i class="fa-solid fa-fire"></i> Curto-Circuito ($R_{ab} = 0$)</h4>
+                    <p>
+                        A resistência entre dois nós cai a zero. A diferença de potencial anula-se:
+                    </p>
+                    <p class="formula-body" style="font-size: 1.1rem; color: var(--neon-rose);">
+                        $$v_{ab} = 0\text{ V}, \quad i \to \max$$
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-dim);">
+                        Não há conversão de energia na junção de curto, mas a corrente fornecida pela fonte pode se elevar a níveis extremos.
+                    </p>
+                </div>
+                <div class="card-panel">
+                    <h4 style="color: var(--electric-cyan);"><i class="fa-solid fa-scissors"></i> Circuito Aberto ($R_{ab} = \infty$)</h4>
+                    <p>
+                        A resistência entre dois nós tende ao infinito (caminho interrompido):
+                    </p>
+                    <p class="formula-body" style="font-size: 1.1rem; color: var(--electric-cyan);">
+                        $$i = 0\text{ A}, \quad v_{ab} \to \max$$
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-dim);">
+                        Nenhuma corrente consegue fluir por terminais desconectados.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: FONTES DEPENDENTES (CONTROLADAS) -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-diamond"></i> Fontes Controladas</div>
+            <h2>4. Modelos de Fontes Dependentes</h2>
+            <p>
+                Fontes dependentes são representadas por <strong>losangos</strong> e seu valor de saída é uma função linear de uma tensão $v_x$ ou corrente $i_x$ presente em outro ramo do circuito. São essenciais para modelar <em>transistores bipolares (BJT), MOSFETs e amplificadores</em>.
+            </p>
+
+            <div class="sources-grid">
+                <div class="source-box">
+                    <div class="code">FTCT</div>
+                    <div class="name">Fonte de Tensão Controlada por Tensão</div>
+                    <div class="eq">$$v_s = \mu \cdot v_x$$</div>
+                </div>
+                <div class="source-box">
+                    <div class="code">FTCC</div>
+                    <div class="name">Fonte de Tensão Controlada por Corrente</div>
+                    <div class="eq">$$v_s = \rho \cdot i_x$$</div>
+                </div>
+                <div class="source-box">
+                    <div class="code">FCCT</div>
+                    <div class="name">Fonte de Corrente Controlada por Tensão</div>
+                    <div class="eq">$$i_s = g \cdot v_x$$</div>
+                </div>
+                <div class="source-box">
+                    <div class="code">FCCC</div>
+                    <div class="name">Fonte de Corrente Controlada por Corrente</div>
+                    <div class="eq">$$i_s = \beta \cdot i_x$$</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 5: DIMENSIONAMENTO PRÁTICO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-wrench"></i> Aplicação Prática</div>
+            <h2>5. Dimensionamento de Resistores: LED do Carro & Apontador</h2>
+            <p>
+                Vamos analisar o clássico exercício do Prof. Amorim: <em>"João quer instalar no carro (bateria de 12V) um LED de alto brilho especificado em 60mW / 3V. Qual resistor $R_x$ deve ser colocado em série?"</em>
+            </p>
+
+            <div class="led-demo-box">
+                <div class="led-visual">
+                    <div class="led-bulb lit" id="ledBulb"></div>
+                    <div class="led-status-tag" id="ledStatus" style="color: var(--neon-emerald);">LED Operando Perfeitamente</div>
+                </div>
+                <div style="flex-grow: 1; max-width: 450px;">
+                    <div class="control-group" style="margin-bottom: 0.8rem;">
+                        <label>Resistor $R_x$ em Série ($\Omega$)</label>
+                        <input type="range" class="custom-slider" id="sliderRx" min="50" max="900" step="25" value="450" style="width: 100%;" oninput="updateLedDemo(this.value)">
+                    </div>
+                    <div class="grid-2col" style="margin: 0; gap: 0.5rem;">
+                        <div class="stat-pill">Corrente $i$: <span id="ledI">20.0 mA</span></div>
+                        <div class="stat-pill">Queda no Resistor: <span id="vRxVal">9.0 V</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">Resolução Algébrica Passo a Passo</span>
+                </div>
+                <div class="formula-body" style="font-size: 1.05rem; text-align: left;">
+                    1. Corrente nominal do LED: $i_{LED} = \frac{P_{LED}}{V_{LED}} = \frac{60\text{ mW}}{3\text{ V}} = 20\text{ mA} = 0{,}02\text{ A}$<br>
+                    2. Tensão que o resistor $R_x$ deve absorver: $V_{Rx} = 12\text{ V} - 3\text{ V} = 9\text{ V}$<br>
+                    3. Cálculo de $R_x$ pela Lei de Ohm: $R_x = \frac{V_{Rx}}{i_{LED}} = \frac{9\text{ V}}{0{,}02\text{ A}} = \mathbf{450\,\Omega}$
+                </div>
+            </div>
+
+            <!-- Quiz Interativo -->
+            <div class="quiz-card">
+                <div class="quiz-title">
+                    <i class="fa-solid fa-circle-question"></i> Quiz: Apontador de Lápis Elétrico (UNIFESP)
+                </div>
+                <div class="quiz-question">
+                    Um apontador elétrico de $240\text{ mW} / 6\text{ V}$ é alimentado por uma bateria de $9\text{ V}$. Qual o valor do resistor $R_x$ necessário para seu funcionamento seguro?
+                </div>
+                <div class="quiz-options">
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, false, 'Incorreto. Calcule a corrente: $i = 240\\text{mW}/6\\text{V} = 40\\text{mA}$, depois $R = (9-6)/40\\text{mA}$.')">
+                        A) $150\,\Omega$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, true, 'Correto! $i = 40\\text{mA}$, $V_{Rx} = 3\\text{V} \\implies R_x = \\frac{3\\text{V}}{0{,}04\\text{A}} = 75\\,\\Omega$.')">
+                        B) $75\,\Omega$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                    <button class="quiz-option-btn" onclick="checkQuiz(this, false, 'Incorreto. Você não subtraiu a queda de 6V da fonte de 9V.')">
+                        C) $225\,\Omega$ <i class="fa-regular fa-circle"></i>
+                    </button>
+                </div>
+                <div id="quizExp" class="quiz-explanation"></div>
+            </div>
+        </section>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="0001-conceitos-fundamentais.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Aula Anterior
+            </a>
+            <a href="0003-leis-de-kirchhoff.html" class="nav-next-btn">
+                Próxima Aula: Topologia & Leis de Kirchhoff <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Scripts dos Simuladores -->
+    <script>
+        // Simulador da 2ª Lei de Ohm
+        const cvsRes = document.getElementById('canvasResistor');
+        const ctxRes = cvsRes.getContext('2d');
+
+        function updateResistorSim() {
+            const l = parseFloat(document.getElementById('sliderL').value);
+            const a = parseFloat(document.getElementById('sliderA').value);
+            const rho = parseFloat(document.getElementById('selMaterial').value);
+            
+            const r = (rho * l) / a;
+            document.getElementById('resCalcVal').innerText = r.toFixed(2) + ' Ω';
+
+            const w = cvsRes.parentElement.clientWidth - 48;
+            const h = 240;
+            cvsRes.width = w;
+            cvsRes.height = h;
+
+            ctxRes.clearRect(0, 0, w, h);
+
+            // Desenhar cilindro representando o condutor
+            const barLen = 100 + l * 25;
+            const barHeight = 20 + a * 6;
+            const startX = (w - barLen) / 2;
+            const startY = (h - barHeight) / 2;
+
+            // Cores baseadas no material
+            let col = '#fbbf24';
+            if (rho == 1) col = '#f97316'; // Cobre
+            if (rho == 2) col = '#94a3b8'; // Alumínio
+            if (rho == 5) col = '#a855f7'; // Níquel-Cromo
+            if (rho == 10) col = '#475569'; // Grafite
+
+            ctxRes.fillStyle = col;
+            ctxRes.strokeStyle = '#ffffff';
+            ctxRes.lineWidth = 2;
+            ctxRes.fillRect(startX, startY, barLen, barHeight);
+            ctxRes.strokeRect(startX, startY, barLen, barHeight);
+
+            // Cotas e Medidas
+            ctxRes.fillStyle = '#f8fafc';
+            ctxRes.font = '12px JetBrains Mono';
+            ctxRes.fillText(`Comprimento l = ${l} m`, startX + 10, startY - 15);
+            ctxRes.fillText(`Área A = ${a} mm²`, startX + barLen + 15, startY + barHeight / 2);
+            ctxRes.fillText(`R = ${r.toFixed(2)} Ω`, w / 2 - 40, startY + barHeight + 35);
+        }
+
+        window.addEventListener('resize', updateResistorSim);
+        setTimeout(updateResistorSim, 50);
+
+        // LED Demo
+        function updateLedDemo(rx) {
+            rx = parseFloat(rx);
+            const vBat = 12;
+            const vLedNominal = 3;
+            const iNominal = 0.02; // 20mA
+            
+            // i real aproximado
+            const iReal = (vBat - vLedNominal) / rx;
+            const vRx = iReal * rx;
+            
+            document.getElementById('ledI').innerText = (iReal * 1000).toFixed(1) + ' mA';
+            document.getElementById('vRxVal').innerText = vRx.toFixed(1) + ' V';
+
+            const bulb = document.getElementById('ledBulb');
+            const status = document.getElementById('ledStatus');
+
+            if (rx < 250) {
+                // Sobrecorrente: Queimado
+                bulb.className = 'led-bulb burned';
+                status.innerText = '⚠️ LED Queimou! (Corrente Excessiva)';
+                status.style.color = 'var(--neon-rose)';
+            } else if (rx > 650) {
+                // Subcorrente: Fraco
+                bulb.className = 'led-bulb';
+                bulb.style.background = 'rgba(0, 242, 254, 0.3)';
+                bulb.style.boxShadow = 'none';
+                status.innerText = 'LED Muito Fraco (Subalimentado)';
+                status.style.color = 'var(--text-dim)';
+            } else {
+                // Perfeito
+                bulb.className = 'led-bulb lit';
+                bulb.style.background = '';
+                bulb.style.boxShadow = '';
+                status.innerText = 'LED Operando Perfeitamente (450Ω ideal)';
+                status.style.color = 'var(--neon-emerald)';
+            }
+        }
+
+        // Quiz Logic
+        function checkQuiz(btn, isCorrect, explanation) {
+            const parent = btn.parentElement;
+            const buttons = parent.querySelectorAll('.quiz-option-btn');
+            buttons.forEach(b => b.disabled = true);
+            
+            if (isCorrect) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('wrong');
+            }
+            
+            const exp = document.getElementById('quizExp');
+            exp.style.display = 'block';
+            exp.innerHTML = `<p style="color: ${isCorrect ? 'var(--neon-emerald)' : 'var(--neon-rose)'}; font-weight: 600;">${isCorrect ? '✅ Resposta Correta!' : '❌ Incorreto.'}</p><p>${explanation}</p>`;
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+    </script>
+</body>
+</html>

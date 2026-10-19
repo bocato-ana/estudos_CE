@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Exercícios Resolvidos & Desafios - Circuitos Elétricos I</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .filter-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: rgba(244, 63, 94, 0.2);
+            border-color: var(--neon-rose);
+            color: #fff;
+        }
+
+        /* Exercise Cards */
+        .ex-card {
+            background: var(--container-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.2s;
+        }
+
+        .ex-card:hover {
+            border-color: var(--border-hover);
+        }
+
+        .ex-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .ex-number {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--neon-rose);
+            text-transform: uppercase;
+        }
+
+        .ex-tag {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+        }
+
+        .ex-prompt {
+            color: #fff;
+            font-size: 1.05rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+
+        /* Interactive Input & Check Area */
+        .ex-interactive-area {
+            background: var(--card-inner);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .ex-input {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 0.55rem 0.9rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            width: 140px;
+        }
+
+        .ex-input:focus {
+            outline: none;
+            border-color: var(--neon-rose);
+        }
+
+        .btn-check {
+            background: linear-gradient(135deg, var(--neon-rose), #fb7185);
+            color: #fff;
+            border: none;
+            padding: 0.55rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-check:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
+        }
+
+        .btn-hint {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.55rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-solution-toggle {
+            background: transparent;
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            color: var(--text-secondary);
+            padding: 0.55rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: auto;
+        }
+
+        .btn-solution-toggle:hover {
+            border-color: #fff;
+            color: #fff;
+        }
+
+        .feedback-box {
+            display: none;
+            width: 100%;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .solution-box {
+            display: none;
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 4px solid var(--neon-emerald);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .solution-box h4 {
+            color: var(--neon-emerald);
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* 8 Bipoles Table Exercise */
+        .bipoles-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            margin: 1rem 0;
+        }
+
+        .bipoles-table th, .bipoles-table td {
+            padding: 0.6rem 0.8rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .bipoles-table th {
+            background: rgba(244, 63, 94, 0.1);
+            color: var(--neon-rose);
+        }
+
+        .bipole-tag-btn {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: none;
+        }
+
+        .btn-dissipando {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--neon-emerald);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-fornecendo {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--neon-amber);
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="nav-bar">
+                <a href="../index.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub Principal
+                </a>
+                <div class="lesson-badge-header">
+                    <i class="fa-solid fa-award"></i> Central de Exercícios • UNIFESP
+                </div>
+            </div>
+            <h1>Central de Exercícios Resolvidos & Desafios</h1>
+            <p class="subtitle">Lista Completa de Exercícios das Aulas 2, 3, 4 e 5 com Auto-avaliação e Resoluções Passo a Passo</p>
+        </header>
+
+        <!-- EXERCÍCIO 1: BLOCOS EM PARALELO -->
+        <div class="ex-card">
+            <div class="ex-header">
+                <div class="ex-number">Exercício 01 • Aula 2 (UNIFESP)</div>
+                <div class="ex-tag">Potência & Convenção Passiva</div>
+            </div>
+            <div class="ex-prompt">
+                Dois blocos A e B estão associados em paralelo sob uma tensão $v(t)$, com uma corrente $i(t)$ fluindo do bloco A para o bloco B. Calcule a potência de cada bloco e determine se o bloco está <strong>absorvendo</strong> ou <strong>fornecendo</strong> energia para os seguintes casos:
+                <br><br>
+                <strong>Item a)</strong> $i = 5\text{ A}$ e $v = 120\text{ V}$<br>
+                <strong>Item b)</strong> $i = 16\text{ A}$ e $v = -150\text{ V}$
+            </div>
+            
+            <div class="ex-interactive-area">
+                <label style="font-family: var(--font-mono); font-size: 0.85rem;">Qual a potência do Bloco A no Item a? (W)</label>
+                <input type="number" class="ex-input" id="ex1Input" placeholder="-600">
+                <button class="btn-check" onclick="checkEx1()">Verificar</button>
+                <button class="btn-solution-toggle" onclick="toggleSolution('solEx1')">Ver Resolução Completa</button>
+                <div class="feedback-box" id="fbEx1"></div>
+            </div>
+
+            <div class="solution-box" id="solEx1">
+                <h4><i class="fa-solid fa-check-double"></i> Resolução Passo a Passo</h4>
+                <p>
+                    <strong>Item a):</strong><br>
+                    - No Bloco A, a corrente $i$ sai pelo terminal $(+)$ $\implies$ elevação de tensão: $p_A = -v \cdot i = -120 \cdot 5 = \mathbf{-600\,\text{W}}$ (<strong>Gera / Fornece energia</strong>).<br>
+                    - No Bloco B, a corrente entra pelo terminal $(+)$ $\implies$ queda de tensão: $p_B = +v \cdot i = +120 \cdot 5 = \mathbf{+600\,\text{W}}$ (<strong>Absorve / Consome energia</strong>).
+                    <br><br>
+                    <strong>Item b):</strong><br>
+                    - Bloco A: $p_A = -v \cdot i = -(-150) \cdot 16 = \mathbf{+2400\,\text{W}}$ (<strong>Consome energia</strong>).<br>
+                    - Bloco B: $p_B = +v \cdot i = +(-150) \cdot 16 = \mathbf{-2400\,\text{W}}$ (<strong>Gera energia</strong>).
+                </p>
+            </div>
+        </div>
+
+        <!-- EXERCÍCIO 2: TABELA DE 8 BIPOLOS -->
+        <div class="ex-card">
+            <div class="ex-header">
+                <div class="ex-number">Exercício 02 • Aula 2 (UNIFESP)</div>
+                <div class="ex-tag">Balanço de Potência de 8 Bipolos</div>
+            </div>
+            <div class="ex-prompt">
+                Calcule a potência de cada um dos 8 componentes da rede e prove que a conservação da energia é respeitada ($\sum P = 0$):
+            </div>
+
+            <table class="bipoles-table">
+                <thead>
+                    <tr>
+                        <th>Bipolo</th>
+                        <th>Tensão (mV)</th>
+                        <th>Corrente (μA)</th>
+                        <th>Potência ($p = v \cdot i$)</th>
+                        <th>Estado Operacional</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>A</td><td>300</td><td>25</td><td>$+7{,}50\,\mu\text{W}$</td><td><span class="bipole-tag-btn btn-dissipando">Dissipando</span></td></tr>
+                    <tr><td>B</td><td>-100</td><td>10</td><td>$-1{,}00\,\mu\text{W}$</td><td><span class="bipole-tag-btn btn-fornecendo">Fornecendo</span></td></tr>
+                    <tr><td>C</td><td>-200</td><td>15</td><td>$-3{,}00\,\mu\text{W}$</td><td><span class="bipole-tag-btn btn-fornecendo">Fornecendo</span></td></tr>
+                    <tr><td>D</td><td>-200</td><td>-35</td><td>$-7{,}00\,\mu\text{W}$</td><td><span class="bipole-tag-btn btn-fornecendo">Fornecendo</span></td></tr>
+                    <tr><td>E</td><td>350</td><td>-25</td><td>$+8{,}75\,\mu\text{W}$</td><td><span class="bipole-tag-btn btn-dissipando">Dissipando</span></td></tr>
+                    <tr><td>F</td><td>200</td><td>10</td><td>$+2{,}00\,\mu\text{W}$</td><td><span class="bipole-tag-btn btn-dissipando">Dissipando</span></td></tr>
+                    <tr><td>G</td><td>-250</td><td>35</td><td>$-8{,}75\,\mu\text{W}$</td><td><span class="bipole-tag-btn btn-fornecendo">Fornecendo</span></td></tr>
+                    <tr><td>H</td><td>50</td><td>-10</td><td>$+0{,}50\,\mu\text{W}$</td><td><span class="bipole-tag-btn btn-dissipando">Dissipando</span></td></tr>
+                </tbody>
+            </table>
+
+            <div class="formula-card" style="border-left-color: var(--neon-emerald); margin-top: 1rem;">
+                <div class="formula-body">
+                    $$\sum P = (-19{,}25 \times 10^{-6}) + (+19{,}25 \times 10^{-6}) = \mathbf{0\,\text{W}}$$
+                </div>
+            </div>
+        </div>
+
+        <!-- EXERCÍCIO 3: ESCADA DE RESISTORES COM FONTE DE 2A -->
+        <div class="ex-card">
+            <div class="ex-header">
+                <div class="ex-number">Exercício 03 • Aula 4 (UNIFESP)</div>
+                <div class="ex-tag">Redução de Malha em Escada</div>
+            </div>
+            <div class="ex-prompt">
+                Uma fonte de corrente de $2\text{A}$ alimenta uma rede em escada com 6 resistores de $6\Omega, 8\Omega, 4\Omega, 8\Omega, 6\Omega, 8\Omega, 4\Omega$. Calcule a resistência equivalente $R_{eq}$ vista pela fonte e a potência fornecida pela fonte de corrente.
+            </div>
+
+            <div class="ex-interactive-area">
+                <label style="font-family: var(--font-mono); font-size: 0.85rem;">Valor de $R_{eq}$ ($\Omega$):</label>
+                <input type="number" class="ex-input" id="ex3Req" placeholder="10">
+                <button class="btn-check" onclick="checkEx3()">Verificar</button>
+                <button class="btn-solution-toggle" onclick="toggleSolution('solEx3')">Ver Resolução Completa</button>
+                <div class="feedback-box" id="fbEx3"></div>
+            </div>
+
+            <div class="solution-box" id="solEx3">
+                <h4><i class="fa-solid fa-check-double"></i> Resolução Passo a Passo</h4>
+                <p>
+                    1. Redução sucessiva da direita para a esquerda:<br>
+                    - Ramo extremo: $8\Omega + 4\Omega = 12\Omega$<br>
+                    - Paralelo com $6\Omega$: $12 \parallel 6 = \frac{12 \cdot 6}{18} = 4\Omega$<br>
+                    - Série com $4\Omega$: $4 + 4 = 8\Omega$<br>
+                    - Paralelo com $8\Omega$: $8 \parallel 8 = 4\Omega$<br>
+                    - Série com $8\Omega$: $4 + 8 = 12\Omega$<br>
+                    - Paralelo com $6\Omega$: $12 \parallel 6 = 4\Omega$<br>
+                    - Série final com $6\Omega$: $4 + 6 = \mathbf{10\,\Omega}$<br><br>
+                    2. Tensão na fonte: $v_{\text{fonte}} = i \cdot R_{eq} = 2 \cdot 10 = \mathbf{20\,\text{V}}$<br>
+                    3. Potência fornecida: $P_{\text{fonte}} = -v \cdot i = -20 \cdot 2 = \mathbf{-40\,\text{W}}$
+                </p>
+            </div>
+        </div>
+
+        <!-- EXERCÍCIO 4: DIVISOR DE CORRENTE TRIPLO -->
+        <div class="ex-card">
+            <div class="ex-header">
+                <div class="ex-number">Exercício 04 • Aula 5 (UNIFESP)</div>
+                <div class="ex-tag">Divisor de Corrente Triplo</div>
+            </div>
+            <div class="ex-prompt">
+                Uma corrente de $10\text{mA}$ alimenta um resistor de $8\Omega$ em série e uma associação paralela de 3 resistores: $5\text{k}\Omega, 3\text{k}\Omega, 15\text{k}\Omega$. Calcule as três correntes $i_1, i_2, i_3$.
+            </div>
+
+            <div class="ex-interactive-area">
+                <label style="font-family: var(--font-mono); font-size: 0.85rem;">Corrente $i_1$ (mA):</label>
+                <input type="number" class="ex-input" id="ex4I1" placeholder="3.333" step="0.001">
+                <button class="btn-check" onclick="checkEx4()">Verificar</button>
+                <button class="btn-solution-toggle" onclick="toggleSolution('solEx4')">Ver Resolução Completa</button>
+                <div class="feedback-box" id="fbEx4"></div>
+            </div>
+
+            <div class="solution-box" id="solEx4">
+                <h4><i class="fa-solid fa-check-double"></i> Resolução Passo a Passo</h4>
+                <p>
+                    1. Resistência equivalente dos ramos 2 e 3: $R_x = 3k \parallel 15k = \frac{45k}{18} = 2{,}5\,\text{k}\Omega$<br>
+                    2. Divisor de corrente entre $5k$ e $R_x$:<br>
+                    $$i_1 = \frac{2{,}5k}{5k + 2{,}5k} \cdot 10\text{mA} = \frac{2{,}5}{7{,}5} \cdot 10 = \mathbf{3{,}333\,\text{mA}}$$<br>
+                    3. Corrente restante que entra no nó de $3k$ e $15k$: $i_x = 10\text{mA} - 3{,}333\text{mA} = 6{,}667\text{mA}$<br>
+                    4. Divisor entre $3k$ e $15k$:<br>
+                    $$i_2 = \frac{15k}{3k + 15k} \cdot 6{,}667\text{mA} = \mathbf{5{,}556\,\text{mA}}$$<br>
+                    $$i_3 = \frac{3k}{3k + 15k} \cdot 6{,}667\text{mA} = \mathbf{1{,}111\,\text{mA}}$$
+                </p>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="0005-laboratorio-virtual.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Laboratório Virtual
+            </a>
+            <a href="0007-instrumentos-medicao-wheatstone.html" class="nav-next-btn">
+                Próxima Aula: Instrumentos & Wheatstone <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Scripts de Validação dos Exercícios -->
+    <script>
+        function toggleSolution(id) {
+            const sol = document.getElementById(id);
+            sol.style.display = (sol.style.display === 'block') ? 'none' : 'block';
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function checkEx1() {
+            const val = parseFloat(document.getElementById('ex1Input').value);
+            const fb = document.getElementById('fbEx1');
+            fb.style.display = 'block';
+            if (val === -600 || val === 600) {
+                fb.innerHTML = `<span style="color: var(--neon-emerald);">✅ Correto! $P_A = -600\\text{W}$ (fornecendo energia).</span>`;
+            } else {
+                fb.innerHTML = `<span style="color: var(--neon-rose);">❌ Incorreto. Lembre-se: $P_A = -v \\cdot i = -(120) \\cdot 5 = -600\\text{W}$.</span>`;
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function checkEx3() {
+            const val = parseFloat(document.getElementById('ex3Req').value);
+            const fb = document.getElementById('fbEx3');
+            fb.style.display = 'block';
+            if (val === 10) {
+                fb.innerHTML = `<span style="color: var(--neon-emerald);">✅ Perfeito! $R_{eq} = 10\\,\\Omega$ e $P_{\\text{fonte}} = -40\\text{W}$.</span>`;
+            } else {
+                fb.innerHTML = `<span style="color: var(--neon-rose);">❌ Incorreto. Tente simplificar a escada de resistores da direita para a esquerda.</span>`;
+            }
+        }
+
+        function checkEx4() {
+            const val = parseFloat(document.getElementById('ex4I1').value);
+            const fb = document.getElementById('fbEx4');
+            fb.style.display = 'block';
+            if (Math.abs(val - 3.333) < 0.1) {
+                fb.innerHTML = `<span style="color: var(--neon-emerald);">✅ Correto! $i_1 = 3{,}333\\,\\text{mA}$.</span>`;
+            } else {
+                fb.innerHTML = `<span style="color: var(--neon-rose);">❌ Incorreto. O valor é $10/3 \\approx 3{,}333\\,\\text{mA}$.</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

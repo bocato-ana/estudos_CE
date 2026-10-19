@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aula 07 & 08: Instrumentos de Medição, Ponte de Wheatstone & Strain Gage</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- MathJax 3 -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="stylesheet" href="../assets/theme.css">
+
+    <style>
+        .step-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .step-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            padding: 0.6rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .step-btn:hover {
+            color: var(--electric-cyan);
+            border-color: rgba(0, 242, 254, 0.3);
+            background: rgba(0, 242, 254, 0.08);
+        }
+
+        .step-btn.active {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(56, 189, 248, 0.2));
+            color: var(--electric-cyan);
+            border-color: var(--electric-cyan);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+        }
+
+        .step-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .step-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .circuit-svg-box {
+            background: #050811;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.6);
+        }
+
+        .circuit-svg-box svg {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.88rem;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .comparison-table th {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--electric-cyan);
+            font-weight: 700;
+        }
+
+        .comparison-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .gauge-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="nav-bar">
+                <a href="../index.html" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub Principal
+                </a>
+                <div class="lesson-badge-header">
+                    <i class="fa-solid fa-gauge-high"></i> Aulas 7 & 8 • Prof. Henrique Amorim
+                </div>
+            </div>
+            <h1>Instrumentos de Medição, Ponte de Wheatstone & Strain Gage</h1>
+            <p class="subtitle">Galvanômetro d’Arsonval, Voltímetro, Amperímetro, Efeito de Carga, Sensibilidade ($\Omega/\text{V}$), Ponte Balanceada e Extensometria</p>
+        </header>
+
+        <!-- SEÇÃO 1: INSTRUMENTOS IDEAIS VS REAIS -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-microchip"></i> Fundamentos Metrológicos</div>
+            <h2>1. Equipamentos de Medição: Ideais vs Reais</h2>
+            <p>
+                Na modelagem analítica elementar de circuitos, tratamos instrumentos como elementos sem perturbação sobre o sistema. Entretanto, instrumentos reais possuem resistência interna finita ou não-nula, introduzindo o chamado <strong>Efeito de Carga</strong> (<em>Loading Effect</em>).
+            </p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Instrumento</th>
+                        <th>Tipo de Ligação</th>
+                        <th>Resistência Ideal ($R_{Dis}$)</th>
+                        <th>Objetivo Físico</th>
+                        <th>Impacto no Circuito</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Amperímetro</strong></td>
+                        <td><span style="color: var(--electric-cyan);"><i class="fa-solid fa-arrows-left-right"></i> Em Série</span></td>
+                        <td>$R_{int} = 0\,\Omega$ (Curto ideal)</td>
+                        <td>Mede a corrente $i$ que atravessa o ramo</td>
+                        <td>Não deve produzir queda de tensão ($v_{amp} = 0\,\text{V}$)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Voltímetro</strong></td>
+                        <td><span style="color: var(--neon-purple);"><i class="fa-solid fa-grip-lines-vertical"></i> Em Paralelo</span></td>
+                        <td>$R_{int} = \infty\,\Omega$ (Circuito aberto)</td>
+                        <td>Mede a ddp $\Delta V$ entre dois nós</td>
+                        <td>Não deve desviar corrente do ramo ($i_{vol} = 0\,\text{A}$)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert-box alert-info">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>
+                    <strong>Princípio da Conservação de Energia na Medição:</strong>
+                    Equipamentos ideais possuem erro nulo porque <strong>não absorvem potência do sistema</strong> sob teste:
+                    $$P_{\text{amperímetro ideal}} = i^2 \cdot R_{int} = i^2 \cdot 0 = 0\,\text{W} \qquad P_{\text{voltímetro ideal}} = \frac{V^2}{R_{int}} = \frac{V^2}{\infty} = 0\,\text{W}$$
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: O MEDIDOR D'ARSONVAL & VOLTÍMETRO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-compass-drafting"></i> O Galvanômetro</div>
+            <h2>2. O Medidor d’Arsonval & Projeto do Voltímetro</h2>
+            <p>
+                O núcleo dos instrumentos analógicos clássicos é o <strong>Galvanômetro d’Arsonval</strong>: uma bobina móvel imersa em campo magnético permanente sustentada por molas de torção helicoidal. Eletricamente, o medidor se comporta como um <strong>resistor ôhmico linear $R_M$</strong> com corrente máxima de deflexão completa (fundo de escala) $I_m$ e tensão correspondente $V_m$:
+            </p>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">Resistência Interna do Galvanômetro</span>
+                </div>
+                <div class="formula-body">
+                    $$R_M = \frac{V_m}{I_m}$$
+                </div>
+                <div class="formula-desc">
+                    Exemplo clássico da UNIFESP: Medidor com $V_m = 50\,\text{mV}$ e $I_m = 1\,\text{mA} \implies R_M = \frac{50\times 10^{-3}}{1\times 10^{-3}} = 50\,\Omega$.
+                </div>
+            </div>
+
+            <h3>Voltímetro: Resistor Limitador Série ($R_L$)</h3>
+            <p>
+                Como o medidor suporta no máximo $V_m = 50\,\text{mV}$, para medir tensões muito maiores (ex: $100\,\text{V}$) é necessário associar um <strong>resistor limitador $R_L$ em série</strong>, formando um <strong>divisor de tensão</strong>:
+            </p>
+
+            <div class="circuit-svg-box">
+                <svg viewBox="0 0 650 180" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Linha do Circuito -->
+                    <line x1="50" y1="90" x2="160" y2="90" stroke="#00f2fe" stroke-width="3" />
+                    <!-- Resistor RL -->
+                    <rect x="160" y="75" width="110" height="30" fill="rgba(0, 242, 254, 0.15)" stroke="#00f2fe" stroke-width="2.5" rx="6" />
+                    <text x="215" y="95" fill="#f8fafc" font-family="'JetBrains Mono'" font-size="14" text-anchor="middle" font-weight="bold">R_L (Limitador)</text>
+                    <line x1="270" y1="90" x2="380" y2="90" stroke="#00f2fe" stroke-width="3" />
+                    <!-- Galvanômetro D'Arsonval -->
+                    <circle cx="430" cy="90" r="40" fill="#090d16" stroke="#a855f7" stroke-width="3" />
+                    <path d="M 405 105 L 445 75" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" />
+                    <circle cx="410" cy="100" r="4" fill="#f43f5e" />
+                    <text x="430" y="150" fill="#c084fc" font-family="'Outfit'" font-size="13" text-anchor="middle" font-weight="600">Medidor d'Arsonval</text>
+                    <text x="430" y="168" fill="#94a3b8" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle">(50mV, 1mA)</text>
+                    <!-- Fio de saída -->
+                    <line x1="470" y1="90" x2="590" y2="90" stroke="#00f2fe" stroke-width="3" />
+                    <circle cx="50" cy="90" r="5" fill="#00f2fe" />
+                    <circle cx="590" cy="90" r="5" fill="#00f2fe" />
+                    <text x="50" y="65" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="13" text-anchor="middle">+ Probe</text>
+                    <text x="590" y="65" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="13" text-anchor="middle">- Probe</text>
+                    <!-- Chave das Tensões -->
+                    <text x="215" y="55" fill="#f59e0b" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">v_RL = 100V - 0.05V = 99.95V</text>
+                    <text x="215" y="135" fill="#10b981" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">R_L = 99.95V / 1mA = 99.95 kΩ</text>
+                </svg>
+            </div>
+
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-calculator" style="color: var(--electric-cyan);"></i> Dimensionamento Analítico</h4>
+                    <p style="font-size: 0.9rem;">
+                        Para a escala máxima $V_{\text{escala}} = 100\,\text{V}$:
+                    </p>
+                    <ul style="color: var(--text-secondary); font-size: 0.9rem; margin-left: 1rem;">
+                        <li>$v_{RL} = V_{\text{escala}} - V_m = 100 - 0{,}05 = 99{,}95\,\text{V}$</li>
+                        <li>$R_L = \frac{v_{RL}}{I_m} = \frac{99{,}95}{1\times 10^{-3}} = \mathbf{99{,}95\,\text{k}\Omega}$</li>
+                        <li>$R_{\text{Disp}} = R_L + R_M = 99.950 + 50 = \mathbf{100\,\text{k}\Omega}$</li>
+                    </ul>
+                </div>
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-gauge" style="color: var(--neon-amber);"></i> Conceito de Sensibilidade ($S$)</h4>
+                    <div class="formula-body" style="font-size: 1.15rem; color: var(--neon-amber);">
+                        $$S = \frac{1}{I_m} = \frac{R_M}{V_m} \quad \left[\frac{\Omega}{\text{V}}\right]$$
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.5rem;">
+                        A sensibilidade é constante para o medidor. Com $I_m = 1\,\text{mA}$, $S = \frac{1}{10^{-3}} = 1000\,\Omega/\text{V}$. A resistência total do voltímetro em qualquer escala é:
+                        <strong>$R_{\text{Disp}} = S \cdot V_{\text{escala}}$</strong>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: O DRAMÁTICO EFEITO DE CARGA DO VOLTÍMETRO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-triangle-exclamation"></i> Efeito de Carga Real</div>
+            <h2>3. O Erro Sistemático de Medição (Exercício UNIFESP)</h2>
+            <p>
+                <strong>Exercício da Aula:</strong> Um divisor de tensão é formado por $R_1 = 20\,\text{k}\Omega$ e $R_2 = 70\,\text{k}\Omega$ alimentados por $V_s = 180\,\text{V}$. Um técnico conecta um voltímetro com sensibilidade $S = 100\,\Omega/\text{V}$ calibrado na escala de $200\,\text{V}$ para medir a ddp em $R_2$. Qual o erro da medição?
+            </p>
+
+            <div class="step-tabs">
+                <button class="step-btn active" onclick="switchVolStep(1)">Etapa 1: Valor Ideal Teórico</button>
+                <button class="step-btn" onclick="switchVolStep(2)">Etapa 2: Resistência do Voltímetro</button>
+                <button class="step-btn" onclick="switchVolStep(3)">Etapa 3: Circuito com o Voltímetro Conectado</button>
+                <button class="step-btn" onclick="switchVolStep(4)">Etapa 4: Cálculo do Erro Percentual</button>
+            </div>
+
+            <div id="volStep1" class="step-pane active">
+                <div class="formula-card">
+                    <div class="formula-header">
+                        <span class="formula-title">Tensão Ideal sem o Medidor ($R_v = \infty$)</span>
+                    </div>
+                    <div class="formula-body">
+                        $$v_{o,\text{ideal}} = \frac{R_2}{R_1 + R_2} \cdot V_s = \frac{70\,\text{k}}{20\,\text{k} + 70\,\text{k}} \cdot 180\,\text{V} = \frac{7}{9} \cdot 180 = \mathbf{140{,}00\,\text{V}}$$
+                    </div>
+                </div>
+            </div>
+
+            <div id="volStep2" class="step-pane">
+                <div class="formula-card" style="border-left-color: var(--neon-amber);">
+                    <div class="formula-header">
+                        <span class="formula-title">Resistência Interna do Instrumento</span>
+                    </div>
+                    <div class="formula-body">
+                        $$R_{\text{Disp}} = S \cdot V_{\text{escala}} = 100\,\frac{\Omega}{\text{V}} \cdot 200\,\text{V} = \mathbf{20\,\text{k}\Omega}$$
+                    </div>
+                    <div class="formula-desc">
+                        Observe que $R_{\text{Disp}} = 20\,\text{k}\Omega$ é da mesma ordem de grandeza que o resistor $R_2 = 70\,\text{k}\Omega$ sob medição! O instrumento irá drenar uma corrente volumosa.
+                    </div>
+                </div>
+            </div>
+
+            <div id="volStep3" class="step-pane">
+                <div class="formula-card" style="border-left-color: var(--electric-blue);">
+                    <div class="formula-header">
+                        <span class="formula-title">Resistência Equivalente em Paralelo com o Voltímetro</span>
+                    </div>
+                    <div class="formula-body">
+                        $$R_{eq2} = R_2 \parallel R_{\text{Disp}} = 70\,\text{k} \parallel 20\,\text{k} = \frac{70 \cdot 20}{70 + 20} = \frac{1400}{90} \approx \mathbf{15{,}56\,\text{k}\Omega}$$
+                        $$v_{o,\text{medido}} = \frac{R_{eq2}}{R_1 + R_{eq2}} \cdot V_s = \frac{15{,}56\,\text{k}}{20\,\text{k} + 15{,}56\,\text{k}} \cdot 180\,\text{V} = \mathbf{78{,}76\,\text{V}}$$
+                    </div>
+                    <div class="formula-desc">
+                        A ddp caiu de $140\,\text{V}$ para apenas $78{,}76\,\text{V}$ devido à presença do aparelho de medição!
+                    </div>
+                </div>
+            </div>
+
+            <div id="volStep4" class="step-pane">
+                <div class="formula-card" style="border-left-color: var(--neon-rose);">
+                    <div class="formula-header">
+                        <span class="formula-title">Cálculo do Erro Percentual de Medição</span>
+                    </div>
+                    <div class="formula-body">
+                        $$\%\text{erro} = \left(\frac{v_{\text{medido}}}{v_{\text{ideal}}} - 1\right) \times 100 = \left(\frac{78{,}76}{140} - 1\right) \times 100 \approx \mathbf{-43{,}74\% \approx -44\%}$$
+                    </div>
+                    <div class="formula-desc" style="color: var(--neon-rose);">
+                        <strong>Conclusão Crítica:</strong> Erro inaceitável de quase 44%! Regra de ouro da engenharia: Para que o erro seja desprezível (< 1%), a resistência do voltímetro deve ser pelo menos 100 vezes maior que a resistência do componente medido: $R_V \ge 100 \cdot R$.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: AMPERÍMETRO REAL & RESISTOR SHUNT -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-arrows-split-up-and-left"></i> Divisor de Corrente</div>
+            <h2>4. Amperímetro: Resistor Shunt ($R_L$ de Derivação)</h2>
+            <p>
+                Para expandir a corrente suportada por um galvanômetro sensível ($I_m = 1\,\text{mA}$) para uma escala ampla (ex: $100\,\text{mA}$), ligamos um <strong>resistor limitador shunt $R_L$ em paralelo</strong>. A imensa maioria da corrente ($99\,\text{mA}$) desvia pelo shunt, permitindo apenas $1\,\text{mA}$ pela bobina:
+            </p>
+
+            <div class="circuit-svg-box">
+                <svg viewBox="0 0 650 190" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Entrada -->
+                    <line x1="50" y1="95" x2="150" y2="95" stroke="#00f2fe" stroke-width="3" />
+                    <text x="95" y="80" fill="#00f2fe" font-family="'JetBrains Mono'" font-size="13" font-weight="bold">I = 100 mA</text>
+                    <circle cx="150" cy="95" r="5" fill="#00f2fe" />
+                    <!-- Ramo Superior (Shunt) -->
+                    <line x1="150" y1="95" x2="150" y2="45" stroke="#00f2fe" stroke-width="3" />
+                    <line x1="150" y1="45" x2="250" y2="45" stroke="#00f2fe" stroke-width="3" />
+                    <rect x="250" y="30" width="120" height="30" fill="rgba(245, 158, 11, 0.15)" stroke="#f59e0b" stroke-width="2.5" rx="6" />
+                    <text x="310" y="50" fill="#fde68a" font-family="'JetBrains Mono'" font-size="13" text-anchor="middle" font-weight="bold">R_L = 0.606 Ω</text>
+                    <text x="310" y="20" fill="#f59e0b" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">i_L = 99 mA</text>
+                    <line x1="370" y1="45" x2="470" y2="45" stroke="#00f2fe" stroke-width="3" />
+                    <line x1="470" y1="45" x2="470" y2="95" stroke="#00f2fe" stroke-width="3" />
+                    <!-- Ramo Inferior (Galvanômetro) -->
+                    <line x1="150" y1="95" x2="150" y2="145" stroke="#00f2fe" stroke-width="3" />
+                    <line x1="150" y1="145" x2="280" y2="145" stroke="#00f2fe" stroke-width="3" />
+                    <circle cx="310" cy="145" r="30" fill="#090d16" stroke="#a855f7" stroke-width="2.5" />
+                    <text x="310" y="150" fill="#c084fc" font-family="'JetBrains Mono'" font-size="13" text-anchor="middle">R_M = 60Ω</text>
+                    <text x="310" y="190" fill="#a855f7" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">i_m = 1 mA (V_m = 60mV)</text>
+                    <line x1="340" y1="145" x2="470" y2="145" stroke="#00f2fe" stroke-width="3" />
+                    <!-- Saída -->
+                    <circle cx="470" cy="95" r="5" fill="#00f2fe" />
+                    <line x1="470" y1="95" x2="580" y2="95" stroke="#00f2fe" stroke-width="3" />
+                    <text x="525" y="80" fill="#00f2fe" font-family="'JetBrains Mono'" font-size="13" font-weight="bold">I = 100 mA</text>
+                </svg>
+            </div>
+
+            <div class="grid-2col">
+                <div class="formula-card">
+                    <div class="formula-header">
+                        <span class="formula-title">Cálculo do Resistor Shunt $R_L$</span>
+                    </div>
+                    <div class="formula-body">
+                        $$R_L = \frac{V_m}{I_{\text{escala}} - I_m} = \frac{60\times 10^{-3}}{100\times 10^{-3} - 1\times 10^{-3}} = \frac{60\,\text{m}}{99\,\text{m}} \approx \mathbf{0{,}606\,\Omega}$$
+                    </div>
+                </div>
+                <div class="formula-card" style="border-left-color: var(--neon-emerald);">
+                    <div class="formula-header">
+                        <span class="formula-title">Resistência Total do Amperímetro ($R_{\text{Disp}}$)</span>
+                    </div>
+                    <div class="formula-body">
+                        $$R_{\text{Disp}} = \frac{V_m}{I_{\text{escala}}} = \frac{60\,\text{mV}}{100\,\text{mA}} = \mathbf{0{,}60\,\Omega}$$
+                    </div>
+                    <div class="formula-desc">
+                        Alternativamente: $R_M \parallel R_L = \frac{60 \times 0{,}606}{60 + 0{,}606} = 0{,}60\,\Omega$.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-panel" style="margin-top: 1.5rem;">
+                <h4><i class="fa-solid fa-ruler-combined" style="color: var(--neon-emerald);"></i> Critérios de Erro Aceitável (Prof. Henrique Amorim)</h4>
+                <p style="font-size: 0.95rem;">
+                    Como regra de projeto para minimizar erros sistemáticos em instrumentação:
+                </p>
+                <div class="grid-2col">
+                    <div class="alert-box alert-info" style="margin: 0;">
+                        <i class="fa-solid fa-check"></i>
+                        <div>
+                            <strong>Amperímetro Aceitável:</strong><br>
+                            $R_{\text{int, amp}} \le \frac{1}{10} R_{\text{mínima do circuito}}$
+                        </div>
+                    </div>
+                    <div class="alert-box alert-info" style="margin: 0;">
+                        <i class="fa-solid fa-check"></i>
+                        <div>
+                            <strong>Voltímetro Aceitável:</strong><br>
+                            $R_{\text{int, vol}} \ge 10 \cdot R_{\text{máxima do circuito}}$
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 5: PONTE DE WHEATSTONE -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-diamond"></i> Medição de Precisão</div>
+            <h2>5. A Ponte de Wheatstone</h2>
+            <p>
+                A Ponte de Wheatstone é o circuito de maior precisão para mensurar resistências desconhecidas ou detectar variações infinitesimais. Em vez de depender da calibração absoluta de um medidor, utiliza o <strong>método nulo</strong>: ajusta-se a ponte até que a diferença de potencial entre os terminais centrais seja identicamente zero ($v_{ab} = 0\,\text{V}$).
+            </p>
+
+            <div class="circuit-svg-box">
+                <svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Fonte à esquerda -->
+                    <line x1="120" y1="160" x2="220" y2="40" stroke="#00f2fe" stroke-width="2.5" />
+                    <line x1="120" y1="160" x2="220" y2="280" stroke="#00f2fe" stroke-width="2.5" />
+                    <!-- Símbolo da fonte Vs -->
+                    <circle cx="120" cy="160" r="24" fill="#090d16" stroke="#00f2fe" stroke-width="2.5" />
+                    <text x="120" y="155" fill="#f8fafc" font-family="'JetBrains Mono'" font-size="14" text-anchor="middle" font-weight="bold">+</text>
+                    <text x="120" y="172" fill="#f8fafc" font-family="'JetBrains Mono'" font-size="14" text-anchor="middle" font-weight="bold">-</text>
+                    <text x="80" y="165" fill="#00f2fe" font-family="'JetBrains Mono'" font-size="14" font-weight="bold">V_s</text>
+
+                    <!-- Nó Superior Topo (Nó A do divisor) -->
+                    <circle cx="220" cy="40" r="5" fill="#38bdf8" />
+                    <!-- Braço R1 (Topo Esquerdo) -->
+                    <line x1="220" y1="40" x2="310" y2="160" stroke="#38bdf8" stroke-width="2.5" />
+                    <rect x="240" y="85" width="60" height="25" fill="#121a2c" stroke="#38bdf8" stroke-width="2" rx="4" transform="rotate(53, 270, 97)" />
+                    <text x="245" y="90" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="13" font-weight="bold">R_1</text>
+
+                    <!-- Braço R2 (Topo Direito) -->
+                    <line x1="220" y1="40" x2="400" y2="40" stroke="#38bdf8" stroke-width="2.5" />
+                    <line x1="400" y1="40" x2="490" y2="160" stroke="#38bdf8" stroke-width="2.5" />
+                    <rect x="420" y="85" width="60" height="25" fill="#121a2c" stroke="#38bdf8" stroke-width="2" rx="4" transform="rotate(-53, 450, 97)" />
+                    <text x="475" y="90" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="13" font-weight="bold">R_2</text>
+
+                    <!-- Galvanômetro Central (Nó A e B) -->
+                    <line x1="310" y1="160" x2="490" y2="160" stroke="#a855f7" stroke-width="2" stroke-dasharray="6" />
+                    <circle cx="400" cy="160" r="20" fill="#090d16" stroke="#a855f7" stroke-width="2" />
+                    <text x="400" y="165" fill="#a855f7" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle">v_ab = 0V</text>
+                    <circle cx="310" cy="160" r="5" fill="#a855f7" />
+                    <circle cx="490" cy="160" r="5" fill="#a855f7" />
+                    <text x="290" y="165" fill="#a855f7" font-family="'JetBrains Mono'" font-size="13" font-weight="bold">a</text>
+                    <text x="510" y="165" fill="#a855f7" font-family="'JetBrains Mono'" font-size="13" font-weight="bold">b</text>
+
+                    <!-- Braço R3 (Fundo Esquerdo) -->
+                    <line x1="310" y1="160" x2="400" y2="280" stroke="#38bdf8" stroke-width="2.5" />
+                    <rect x="330" y="205" width="60" height="25" fill="#121a2c" stroke="#38bdf8" stroke-width="2" rx="4" transform="rotate(-53, 360, 217)" />
+                    <text x="325" y="235" fill="#38bdf8" font-family="'JetBrains Mono'" font-size="13" font-weight="bold">R_3</text>
+
+                    <!-- Braço Rx (Fundo Direito) -->
+                    <line x1="490" y1="160" x2="400" y2="280" stroke="#f59e0b" stroke-width="2.5" />
+                    <rect x="420" y="205" width="60" height="25" fill="#121a2c" stroke="#f59e0b" stroke-width="2" rx="4" transform="rotate(53, 450, 217)" />
+                    <text x="475" y="235" fill="#f59e0b" font-family="'JetBrains Mono'" font-size="13" font-weight="bold">R_x</text>
+
+                    <!-- Nó Inferior -->
+                    <circle cx="400" cy="280" r="5" fill="#38bdf8" />
+                    <line x1="220" y1="280" x2="400" y2="280" stroke="#00f2fe" stroke-width="2.5" />
+                </svg>
+            </div>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">Condição Fundamental de Equilíbrio</span>
+                </div>
+                <div class="formula-body">
+                    $$R_1 \cdot R_x = R_2 \cdot R_3 \iff R_x = \frac{R_2 \cdot R_3}{R_1}$$
+                </div>
+                <div class="formula-desc">
+                    <strong>Regra Prática do Produto Cruzado:</strong> O produto dos resistores dos braços opostos deve ser idêntico! Quando equilibrada, a corrente pelo ramo central é nula e o resistor central dissipa exatamente $0\,\text{W}$.
+                </div>
+            </div>
+
+            <h3>Exercício Resolvido: Potência no Resistor Central</h3>
+            <p>
+                Considere uma ponte alimentada por fonte de $30\,\text{V}$ com $R_{\text{topo-esq}} = 10\,\Omega$, $R_{\text{topo-dir}} = 30\,\Omega$, $R_{\text{base-esq}} = 6\,\Omega$, $R_{\text{base-dir}} = 18\,\Omega$ e um resistor central de $50\,\Omega$ em série com um resistor de entrada de $3\,\Omega$. Calcule a potência dissipada pelo resistor de $18\,\Omega$:
+            </p>
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-check-double" style="color: var(--neon-emerald);"></i> 1. Verificação do Equilíbrio</h4>
+                    <p style="font-size: 0.9rem;">
+                        Produto cruzado dos braços:
+                        $$10 \cdot 18 = 6 \cdot 30 = 180\,\Omega^2$$
+                        Como a ponte está em equilíbrio:
+                        $$v_{50\Omega} = 0\,\text{V} \implies i_{50\Omega} = 0\,\text{A}$$
+                        O resistor de $50\,\Omega$ pode ser retirado (circuito aberto).
+                    </p>
+                </div>
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-bolt" style="color: var(--neon-amber);"></i> 2. Resolução do Circuito</h4>
+                    <p style="font-size: 0.9rem;">
+                        Ramos verticais em série:
+                        $$R_{\text{ramo1}} = 10 + 6 = 16\,\Omega \qquad R_{\text{ramo2}} = 30 + 18 = 48\,\Omega$$
+                        $$R_{eq} = (16 \parallel 48) + 3 = \frac{16 \cdot 48}{64} + 3 = 12 + 3 = 15\,\Omega$$
+                        $$i_{\text{total}} = \frac{30\,\text{V}}{15\,\Omega} = 2\,\text{A} \implies i_{18\Omega} = \frac{16}{16 + 48} \cdot 2 = 0{,}5\,\text{A}$$
+                        $$P_{18\Omega} = i_{18\Omega}^2 \cdot 18 = (0{,}5)^2 \cdot 18 = \mathbf{4{,}5\,\text{W}}$$
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 6: ESTUDO DE CASO AVANÇADO - STRAIN GAGE -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-weight-hanging"></i> Aplicação na Indústria</div>
+            <h2>6. Estudo de Caso: Sensor de Deformação (Strain Gage)</h2>
+            <p>
+                O <strong>Strain Gage</strong> (extensômetro) é uma folha com filamento metálico colada a uma estrutura. Quando submetida à tensão mecânica, sua resistência elétrica sofre uma pequena perturbação:
+                $$R_{sg} = R_0 \pm \Delta R$$
+                Normalmente $R_0 = 120\,\Omega$ e a variação máxima sob esforço extremo é de apenas $\Delta R = \pm 0{,}8\,\Omega$ (menos de 0,7% de variação).
+            </p>
+
+            <div class="alert-box alert-warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <strong>Por que NÃO usar um divisor de tensão simples?</strong><br>
+                    Alimentando com $12\,\text{V}$ e um resistor fixo de $120\,\Omega$, a saída $v_o$ varia entre $5{,}98\,\text{V}$ e $6{,}02\,\text{V}$. O sinal útil varia em apenas $\pm 20\,\text{mV}$, mas está "montado" sobre um pedestal de contínua enorme de $+6{,}00\,\text{V}$. Se tentarmos amplificar por $1200\times$, o amplificador satura imediatamente nos trilhos de alimentação!
+                </div>
+            </div>
+
+            <h3>A Solução Magistral: Ponte de Wheatstone com Strain Gage</h3>
+            <p>
+                Posicionando o sensor em um dos braços da ponte, quando $\Delta R = 0$ a ponte está rigorosamente em equilíbrio e <strong>$v_o = 0\,\text{V}$</strong>. Toda a tensão de modo comum desaparece!
+            </p>
+
+            <div class="formula-card">
+                <div class="formula-header">
+                    <span class="formula-title">Dedução da Equação de Saída $v_o$</span>
+                </div>
+                <div class="formula-body">
+                    $$v_o = v_{R4} - v_{R3} = \left(\frac{R_4}{R_4 + R_0 + \Delta R} - \frac{R_4}{R_4 + R_0}\right) \cdot v_{in}$$
+                    $$v_o = - \frac{v_{in} \cdot R_4 \cdot \Delta R}{(R_4 + R_0 + \Delta R)(R_4 + R_0)}$$
+                </div>
+                <div class="formula-desc">
+                    Como $\Delta R \ll R_0$ ($\Delta R = 0{,}8\,\Omega \ll 120\,\Omega$), podemos fazer a aproximação linear:
+                </div>
+                <div class="formula-body" style="color: var(--neon-emerald); font-size: 1.4rem;">
+                    $$v_o \approx - \frac{v_{in} \cdot R_4 \cdot \Delta R}{(R_4 + R_0)^2}$$
+                </div>
+            </div>
+
+            <div class="grid-2col">
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-calculator" style="color: var(--electric-cyan);"></i> Exemplo Numérico do Slide</h4>
+                    <p style="font-size: 0.9rem;">
+                        Com $v_{in} = 12\,\text{V}$ e $R_0 = R_4 = 120\,\Omega$:
+                        $$v_o \approx - \frac{12 \cdot 120 \cdot \Delta R}{(120 + 120)^2} = - \frac{1440}{57600} \Delta R = -0{,}025 \cdot \Delta R$$
+                    </p>
+                    <ul style="color: var(--text-secondary); font-size: 0.88rem; margin-left: 1rem;">
+                        <li>Para compressão ($\Delta R = -0{,}8\,\Omega$): $v_o \approx +20\,\text{mV}$</li>
+                        <li>Para tração ($\Delta R = +0{,}8\,\Omega$): $v_o \approx -20\,\text{mV}$</li>
+                    </ul>
+                </div>
+                <div class="card-panel">
+                    <h4><i class="fa-solid fa-volume-high" style="color: var(--neon-purple);"></i> Amplificação de Instrumentação</h4>
+                    <p style="font-size: 0.9rem;">
+                        Com um amplificador de ganho $A_v = 1200\times$:
+                        $$V_x = 1200 \cdot v_o$$
+                        $$V_x \in [-24\,\text{V}, +24\,\text{V}]$$
+                    </p>
+                    <p style="font-size: 0.85rem; color: var(--text-dim);">
+                        O sinal de milivolts foi expandido para uma faixa dinâmica industrial de 48V pico-a-pico perfeitamente centrada no zero!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 7: SIMULADOR INTERATIVO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-sliders"></i> Laboratório Interativo</div>
+            <h2>7. Bancada Virtual: Strain Gage na Ponte de Wheatstone</h2>
+            <div class="sim-container">
+                <div class="sim-header">
+                    <div class="sim-title">
+                        <i class="fa-solid fa-gauge"></i> Resposta do Sensor e Ganho em Tempo Real
+                    </div>
+                    <div class="sim-stats">
+                        <div class="stat-pill">Tensão na Ponte $v_o$: <span id="dispVo">0.00 mV</span></div>
+                        <div class="stat-pill">Saída Amplificada $V_x$: <span id="dispVx" style="color: var(--neon-amber);">0.00 V</span></div>
+                    </div>
+                </div>
+                <div class="gauge-container">
+                    <div style="text-align: center;">
+                        <span style="font-size: 0.85rem; color: var(--text-dim); font-family: var(--font-mono);">DEFORMAÇÃO MECÂNICA</span>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--electric-cyan); font-family: var(--font-mono);" id="dispDeltaR">0.00 Ω</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <span style="font-size: 0.85rem; color: var(--text-dim); font-family: var(--font-mono);">RESISTÊNCIA DO SENSOR</span>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--neon-emerald); font-family: var(--font-mono);" id="dispRsg">120.00 Ω</div>
+                    </div>
+                </div>
+                <div class="sim-controls">
+                    <div class="control-group">
+                        <label>Variação $\Delta R$ (Compressão / Tração em $\Omega$)</label>
+                        <input type="range" class="custom-slider" id="sliderDeltaR" min="-0.8" max="0.8" step="0.05" value="0" oninput="updateStrainSim()" style="width: 240px;">
+                    </div>
+                    <div class="control-group">
+                        <label>Ganho do Amplificador ($A_v$)</label>
+                        <input type="range" class="custom-slider" id="sliderGain" min="200" max="1500" step="50" value="1200" oninput="updateStrainSim()">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 8: QUIZ DE FIXAÇÃO -->
+        <section class="content-section">
+            <div class="section-tag"><i class="fa-solid fa-clipboard-check"></i> Fixação</div>
+            <h2>8. Questões de Autoavaliação</h2>
+            
+            <div class="quiz-card">
+                <div class="quiz-title"><i class="fa-solid fa-question"></i> Questão 1: Efeito de Carga</div>
+                <div class="quiz-question">
+                    Para minimizar o erro sistemático ao medir a corrente em um ramo de um circuito onde o menor resistor vale $50\,\Omega$, a resistência interna do amperímetro deve ser idealmente:
+                </div>
+                <div class="quiz-options">
+                    <button class="quiz-option-btn" onclick="checkQ(this, false, 'q1Exp')">A) Maior que 500 Ω.</button>
+                    <button class="quiz-option-btn" onclick="checkQ(this, true, 'q1Exp')">B) Menor que 5 Ω (critério de 1/10).</button>
+                    <button class="quiz-option-btn" onclick="checkQ(this, false, 'q1Exp')">C) Exatamente igual a 50 Ω.</button>
+                </div>
+                <div id="q1Exp" class="quiz-explanation">
+                    <strong>Correto!</strong> Pelo critério do Prof. Henrique Amorim, $R_{\text{int, amp}} \le \frac{1}{10} R_{\text{mín}} = \frac{50}{10} = 5\,\Omega$.
+                </div>
+            </div>
+
+            <div class="quiz-card">
+                <div class="quiz-title"><i class="fa-solid fa-question"></i> Questão 2: Ponte de Wheatstone</div>
+                <div class="quiz-question">
+                    Em uma ponte de Wheatstone com resistores $R_1 = 100\,\Omega$, $R_2 = 150\,\Omega$ e $R_3 = 30\,\Omega$, qual valor de $R_x$ garante o equilíbrio da ponte?
+                </div>
+                <div class="quiz-options">
+                    <button class="quiz-option-btn" onclick="checkQ(this, true, 'q2Exp')">A) 20 Ω</button>
+                    <button class="quiz-option-btn" onclick="checkQ(this, false, 'q2Exp')">B) 45 Ω</button>
+                    <button class="quiz-option-btn" onclick="checkQ(this, false, 'q2Exp')">C) 500 Ω</button>
+                </div>
+                <div id="q2Exp" class="quiz-explanation">
+                    <strong>Correto!</strong> Pela condição de equilíbrio: $R_1 \cdot R_3 = R_2 \cdot R_x \implies 100 \cdot 30 = 150 \cdot R_x \implies R_x = \frac{3000}{150} = 20\,\Omega$.
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <a href="0006-exercicios-resolvidos.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Lista de Exercícios
+            </a>
+            <a href="0008-transformacao-estrela-triangulo.html" class="nav-next-btn">
+                Próxima Aula: Conversão Y-Δ e Δ-Y <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function switchVolStep(step) {
+            document.querySelectorAll('.step-btn').forEach((b, idx) => {
+                b.classList.toggle('active', idx === step - 1);
+            });
+            for (let i = 1; i <= 4; i++) {
+                const pane = document.getElementById('volStep' + i);
+                if (pane) pane.classList.toggle('active', i === step);
+            }
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        function updateStrainSim() {
+            const deltaR = parseFloat(document.getElementById('sliderDeltaR').value);
+            const gain = parseFloat(document.getElementById('sliderGain').value);
+            const vin = 12.0;
+            const r0 = 120.0;
+            const r4 = 120.0;
+            
+            // Fórmula exata do divisor na ponte
+            const vR4 = (r4 / (r4 + r0 + deltaR)) * vin;
+            const vR3 = (r4 / (r4 + r0)) * vin;
+            const vo = vR4 - vR3; // em Volts
+            const voMv = vo * 1000;
+            const vx = vo * gain;
+
+            document.getElementById('dispDeltaR').innerText = (deltaR >= 0 ? '+' : '') + deltaR.toFixed(2) + ' Ω';
+            document.getElementById('dispRsg').innerText = (r0 + deltaR).toFixed(2) + ' Ω';
+            document.getElementById('dispVo').innerText = voMv.toFixed(2) + ' mV';
+            document.getElementById('dispVx').innerText = vx.toFixed(2) + ' V';
+        }
+
+        function checkQ(btn, isCorrect, expId) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.quiz-option-btn').forEach(b => b.disabled = true);
+            if (isCorrect) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('wrong');
+            }
+            const exp = document.getElementById(expId);
+            if (exp) exp.style.display = 'block';
+            if (window.MathJax) MathJax.typesetPromise();
+        }
+
+        updateStrainSim();
+    </script>
+</body>
+</html>
